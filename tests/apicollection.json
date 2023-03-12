@@ -317,7 +317,10 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"console.log('I am in call 2');"
+							"console.log('I am in call 2');",
+							"pm.test(\"Response time is less than 200ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
