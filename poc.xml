@@ -1,0 +1,7 @@
+<tagsMapping>
+    <testCase id="40081" name="Create Apps Configuration" tags="Tag1,Tag2,Tag5"/>
+    <testCase id="40082" name="UCF Config deployment" tags="Tag2"/>
+    <testCase id="40083" name="App Config Deployment" tags="Tag3"/>
+    <testCase id="40084" name="VCC Config deployment" tags="Tag4,Tag5"/>
+    <testCase id="40085" name="Update Location and Contact Info and Refresh PDP" tags="Tag5"/>
+</tagsMapping>

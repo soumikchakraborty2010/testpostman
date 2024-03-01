@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Editor</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        body, h2, label, input, select, option, table, th, td {
+        font-size: 16px; /* You can adjust the font size as needed */
+        }
+
+        h2 {
+        font-size: 26px; /* You can adjust the font size as needed */
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        th:first-child { /* Apply styling only to the first column header */
+            width: 50px;
+        }
+
+        form {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        input[type="button"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        input[type="button"] {
+        width: 10%; /* Adjust the percentage as needed */
+    }
+
+        #readOnlyTable {
+            margin-top: 20px;
+        }
+
+        #addButton {
+            background-color: #008CBA;
+            margin-top: 10px;
+        }
+
+        #removeButton {
+            background-color: #FF6347; /* Adjust the color as needed */
+            margin-top: 10px;
+            margin-right: 5px; /* Add margin-right for spacing between Remove and Update buttons */
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Fleet Robot Test Case Tag Addition/Modification</h2>
+
+    <form id="xmlForm">
+        <label><input type="radio" name="editType" value="existing" onclick="toggleEditMode(this)" onchange="handleRadioButtonChange()">Select Existing Test Cases</label>
+        <label><input type="radio" name="editType" value="new" onclick="toggleEditMode(this)" onchange="handleRadioButtonChange()">Add New</label>
+
+        <table id="xmlTable">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>TC ID</th>
+                    <th>TC Name</th>
+                    <th>Tags</th>
+                </tr>
+            </thead>
+            <tbody id="xmlTableBody">
+                <!-- Existing data will be displayed here -->
+            </tbody>
+        </table>
+
+        <label for="tcId">TC ID:</label>
+        <input type="text" id="tcId" readonly>
+
+        <label for="tcName">TC Name:</label>
+        <input type="text" id="tcName" readonly>
+
+        <label for="tags">Tags:</label>
+        <select id="tags" multiple>
+            <!-- Options will be dynamically populated based on selected row -->
+        </select>
+
+        <input type="button" value="Add" onclick="addRowToReadOnlyTable()" id="addButton"> <!-- Move Add button here -->
+
+        <div id="readOnlyTable">
+            <h3>Click Update/Submit button below to update these Test Cases</h3>
+            <table id="readOnlyTableBody">
+                <thead>
+                    <tr>
+                        <th></th> <!-- Empty header for checkbox -->
+                        <th>TC ID</th>
+                        <th>TC Name</th>
+                        <th>Tags</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be dynamically populated here -->
+                </tbody>
+            </table>
+            <input type="button" value="Remove" onclick="removeSelectedRows()" id="removeButton">
+            <input type="button" value="Update" onclick="updateXml()" id="submitButton" disabled>
+        </div>
+
+        <!-- <div id="messageDiv"></div> -->
+
+        <!-- Modal to display messages -->
+        <div id="messageModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeMessageModal()">&times;</span>
+                <p id="messageText"></p>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        function toggleEditMode(radio) {
+            var table = document.getElementById("xmlTable");
+            var tcIdInput = document.getElementById("tcId");
+            var tcNameInput = document.getElementById("tcName");
+            var tagsSelect = document.getElementById("tags");
+            var submitButton = document.getElementById("submitButton");
+
+            if (radio.value === "existing") {
+                // Select Existing Test Cases
+                table.removeAttribute("disabled");
+                tcIdInput.setAttribute("readonly", true);
+                tcNameInput.setAttribute("readonly", true);
+                tagsSelect.removeAttribute("disabled");
+                submitButton.removeAttribute("disabled");
+
+                // Clear and disable TC ID and TC Name
+                tcIdInput.value = "";
+                tcNameInput.value = "";
+                submitButton.value = "Update"; // Change button text to "Update"
+            } else if (radio.value === "new") {
+                // Add New
+                table.setAttribute("disabled", true);
+                tcIdInput.value = "";
+                tcNameInput.value = "";
+                tagsSelect.innerHTML = "";  // Clear options
+                tagsSelect.setAttribute("disabled", true);
+                submitButton.setAttribute("disabled", true);
+
+                // Make the textboxes editable
+                tcIdInput.removeAttribute("readonly");
+                tcNameInput.removeAttribute("readonly");
+                submitButton.value = "Update"; // Change button text back to "Update"
+            }
+        }
+
+
+        // Function to populate the table with existing XML data
+        function populateTable(xmlDoc) {
+            var tableBody = document.getElementById("xmlTableBody");
+            tableBody.innerHTML = "";
+
+            var selectExisting = document.querySelector('input[name="editType"][value="existing"]').checked;
+
+            if (selectExisting) {
+                var testCaseNodes = xmlDoc.querySelectorAll('testCase');
+                testCaseNodes.forEach(function (testCase) {
+                    var row = tableBody.insertRow();
+
+                    var cellSelect = row.insertCell(0);  // Insert the "Select" radio button here
+                    var cellId = row.insertCell(1);
+                    var cellName = row.insertCell(2);
+                    var cellTags = row.insertCell(3);
+
+                    var radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'selectedRow';
+                    radio.onclick = function () {
+                        handleRadioClick(testCase);
+                    };
+
+                    cellSelect.appendChild(radio);  // Append the radio button to the "Select" cell
+
+                    cellId.innerText = testCase.getAttribute('id');
+                    cellName.innerText = testCase.getAttribute('name');
+                    cellTags.innerText = testCase.getAttribute('tags');
+                });
+
+                document.getElementById("xmlTable").style.display = "table"; // Show the table
+            } else {
+                document.getElementById("xmlTable").style.display = "none"; // Hide the table
+            }
+        }
+
+
+        function handleRadioClick(testCase) {
+            var tcIdInput = document.getElementById("tcId");
+            var tcNameInput = document.getElementById("tcName");
+            var tagsSelect = document.getElementById("tags");
+
+            tcIdInput.value = testCase.getAttribute('id');
+            tcNameInput.value = testCase.getAttribute('name');
+
+            // Clear and populate the Tags select based on the selected row
+            tagsSelect.innerHTML = "";
+
+            var tags = testCase.getAttribute('tags').split(',');
+
+            tags.forEach(function (tag) {
+                var option = document.createElement('option');
+                option.value = tag.trim();  // Trim to remove extra whitespaces
+                option.text = tag.trim();
+                tagsSelect.add(option);
+            });
+
+            // Enable the Tags select
+            tagsSelect.removeAttribute("disabled");
+
+            // Check if Submit button should be enabled
+            checkSubmitButtonState();
+        }
+
+
+
+        // Function to update XML
+        function updateXml() {
+            // Your existing code for updating XML
+        }
+
+        // Function to check the state of the Submit button
+        function checkSubmitButtonState() {
+            var tcIdInput = document.getElementById("tcId");
+            var tcNameInput = document.getElementById("tcName");
+            var tagsSelect = document.getElementById("tags");
+            var submitButton = document.getElementById("submitButton");
+
+            if (tcIdInput.value && tcNameInput.value && tagsSelect.selectedOptions.length > 0) {
+                submitButton.removeAttribute("disabled");
+            } else {
+                submitButton.setAttribute("disabled", true);
+            }
+        }
+
+        // Read the XML file during initial load
+        var initialXhr = new XMLHttpRequest();
+        initialXhr.onreadystatechange = function () {
+            if (initialXhr.readyState == 4 && initialXhr.status == 200) {
+                var initialXmlDoc = initialXhr.responseXML;
+                // Populate the table with the initial XML data
+                populateTable(initialXmlDoc);
+            }
+        };
+
+        initialXhr.open("GET", "poc.xml", true);
+        initialXhr.send();
+
+        // Function to handle radio button change
+        function handleRadioButtonChange() {
+            var editTypeRadios = document.getElementsByName("editType");
+            var selectedEditType;
+
+            for (var i = 0; i < editTypeRadios.length; i++) {
+                if (editTypeRadios[i].checked) {
+                    selectedEditType = editTypeRadios[i].value;
+                    break;
+                }
+            }
+
+            if (selectedEditType === "existing") {
+                // Read the XML file and populate the table during initial load
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var xmlDoc = xhr.responseXML;
+                        populateTable(xmlDoc);
+                    }
+                };
+
+                // Append timestamp for cache-busting
+                xhr.open("GET", "poc.xml?timestamp=" + new Date().getTime(), true);
+                xhr.send();
+            } else {
+                document.getElementById("xmlTable").style.display = "none"; // Hide the table for "Add New" mode
+            }
+        }
+
+            // Function to add a row to the read-only table
+            function addRowToReadOnlyTable() {
+                var tcId = document.getElementById("tcId").value;
+                var tcName = document.getElementById("tcName").value;
+                var selectedTags = Array.from(document.getElementById("tags").selectedOptions).map(option => option.value);
+
+                // Reference to the read-only table body
+                var readOnlyTableBody = document.getElementById("readOnlyTableBody").getElementsByTagName('tbody')[0];
+
+                // Check if at least one tag is selected
+                if (selectedTags.length === 0) {
+                    showMessage("Please select at least one tag.");
+                    return;
+                }
+
+                // Check if the TC ID is already present in the read-only table
+                var existingTcIds = Array.from(readOnlyTableBody.getElementsByTagName('tr')).map(row => row.cells[1].innerText);
+                if (existingTcIds.includes(tcId)) {
+                    showMessage("TC ID already exists in the table.  Select and Remove the entry before adding this.");
+                    return;
+                }
+
+                // Create a new row
+                var newRow = readOnlyTableBody.insertRow();
+
+                // Insert cells with data
+                var cellCheckbox = newRow.insertCell(0);
+                var cellId = newRow.insertCell(1);
+                var cellName = newRow.insertCell(2);
+                var cellTags = newRow.insertCell(3);
+
+                // Populate cells with data
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                cellCheckbox.appendChild(checkbox);
+
+                cellId.innerText = tcId;
+                cellName.innerText = tcName;
+                cellTags.innerText = selectedTags.join(', ');
+
+                // Clear the message modal
+                closeMessageModal();
+            }
+
+
+            // Function to display messages in the modal
+            function showMessage(message) {
+                var messageText = document.getElementById("messageText");
+                messageText.innerText = message;
+
+                var messageModal = document.getElementById("messageModal");
+                messageModal.style.display = "block";
+            }
+
+            // Function to close the modal
+            function closeMessageModal() {
+                var messageModal = document.getElementById("messageModal");
+                messageModal.style.display = "none";
+            }
+
+            // Function to remove selected rows from the read-only table
+            function removeSelectedRows() {
+                var readOnlyTableBody = document.getElementById("readOnlyTableBody").getElementsByTagName('tbody')[0];
+                var selectedCheckboxes = readOnlyTableBody.querySelectorAll('input[type="checkbox"]:checked');
+
+                selectedCheckboxes.forEach(function (checkbox) {
+                    // Remove the entire row associated with the checkbox
+                    var row = checkbox.closest('tr');
+                    row.remove();
+                });
+            }
+
+    </script>
+
+</body>
+</html>
