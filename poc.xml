@@ -1,5 +1,5 @@
 <tagsMapping>
-    <testCase id="40081" name="test case soumik test 1" tags="Tag1,Tag2,Tag5"/>
+    <testCase id="40081" name="Title of a test case" tags="Tag1,Tag2,Tag5"/>
     <testCase id="40082" name="UCF Config deployment 2" tags="Tag2"/>
     <testCase id="40083" name="App Config Deployment 3" tags="Tag3"/>
     <testCase id="40084" name="VCC Config deployment 4" tags="Tag4,Tag5"/>
