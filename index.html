@@ -301,38 +301,105 @@
                     }
             
                     // Function to generate tree view
+                    // function generateTreeView(xmlDoc) {
+                    //     var tags = Array.from(xmlDoc.querySelectorAll("testCase")).reduce((acc, testCase) => {
+                    //         var testCaseTags = testCase.getAttribute("tags").split(",");
+                    //         return acc.concat(testCaseTags);
+                    //     }, []);
+            
+                    //     tags = Array.from(new Set(tags));
+            
+                    //     var tagsContainer = document.getElementById("tagsContainer");
+            
+                    //     tags.forEach(tag => {
+                    //         var tagElement = document.createElement("div");
+                    //         tagElement.className = "tag"; // Add the .tag class
+                    //         tagElement.innerHTML = `<span id="${tag}-icon" onclick="showTestCases('${tag}')">[+]</span> ${tag}`;
+                    //         tagsContainer.appendChild(tagElement);
+            
+                    //         var testCasesContainer = document.createElement("div");
+                    //         testCasesContainer.id = `${tag}-testCases`;
+                    //         testCasesContainer.style.marginLeft = "20px";
+                    //         testCasesContainer.style.display = "none";
+            
+                    //         var filteredTestCases = xmlDoc.querySelectorAll(`testCase[tags*="${tag}"]`);
+            
+                    //         filteredTestCases.forEach(testCase => {
+                    //             var testCaseElement = document.createElement("div");
+                    //             testCaseElement.innerHTML = `${testCase.getAttribute("id")} : ${testCase.getAttribute("name")}`;
+                    //             testCasesContainer.appendChild(testCaseElement);
+                    //         });
+            
+                    //         tagsContainer.appendChild(testCasesContainer);
+                    //     });
+                    // }
+
                     function generateTreeView(xmlDoc) {
-                        var tags = Array.from(xmlDoc.querySelectorAll("testCase")).reduce((acc, testCase) => {
+                        var tagsContainer = document.getElementById("tagsContainer");
+                        tagsContainer.innerHTML = ''; // Clear existing content
+
+                        var allTestCases = xmlDoc.querySelectorAll("testCase");
+
+                        // Separate test cases into those with tags and those without
+                        var testCasesWithTags = Array.from(allTestCases).filter(testCase => {
+                            var tags = testCase.getAttribute("tags");
+                            return tags && tags.trim() !== "";
+                        });
+
+                        var testCasesWithoutTags = Array.from(allTestCases).filter(testCase => {
+                            var tags = testCase.getAttribute("tags");
+                            return !tags || tags.trim() === "";
+                        });
+
+                        // Create a section for test cases with no tags
+                        var noTagsSection = document.createElement("div");
+                        noTagsSection.className = "tag";
+                        noTagsSection.innerHTML = `<span id="noTags-icon" onclick="showTestCases('noTags')">[+]</span> No Tags`;
+                        tagsContainer.appendChild(noTagsSection);
+
+                        var noTagsTestCasesContainer = document.createElement("div");
+                        noTagsTestCasesContainer.id = "noTags-testCases";
+                        noTagsTestCasesContainer.style.marginLeft = "20px";
+                        noTagsTestCasesContainer.style.display = "none";
+
+                        testCasesWithoutTags.forEach(testCase => {
+                            var testCaseElement = document.createElement("div");
+                            testCaseElement.innerHTML = `${testCase.getAttribute("id")} : ${testCase.getAttribute("name")}`;
+                            noTagsTestCasesContainer.appendChild(testCaseElement);
+                        });
+
+                        tagsContainer.appendChild(noTagsTestCasesContainer);
+
+                        // Create sections for test cases with tags
+                        var tags = Array.from(new Set(testCasesWithTags.reduce((acc, testCase) => {
                             var testCaseTags = testCase.getAttribute("tags").split(",");
                             return acc.concat(testCaseTags);
-                        }, []);
-            
-                        tags = Array.from(new Set(tags));
-            
-                        var tagsContainer = document.getElementById("tagsContainer");
-            
+                        }, [])));
+
                         tags.forEach(tag => {
                             var tagElement = document.createElement("div");
-                            tagElement.className = "tag"; // Add the .tag class
+                            tagElement.className = "tag";
                             tagElement.innerHTML = `<span id="${tag}-icon" onclick="showTestCases('${tag}')">[+]</span> ${tag}`;
                             tagsContainer.appendChild(tagElement);
-            
+
                             var testCasesContainer = document.createElement("div");
                             testCasesContainer.id = `${tag}-testCases`;
                             testCasesContainer.style.marginLeft = "20px";
                             testCasesContainer.style.display = "none";
-            
-                            var filteredTestCases = xmlDoc.querySelectorAll(`testCase[tags*="${tag}"]`);
-            
+
+                            var filteredTestCases = testCasesWithTags.filter(testCase => testCase.getAttribute("tags").includes(tag));
+
                             filteredTestCases.forEach(testCase => {
                                 var testCaseElement = document.createElement("div");
                                 testCaseElement.innerHTML = `${testCase.getAttribute("id")} : ${testCase.getAttribute("name")}`;
                                 testCasesContainer.appendChild(testCaseElement);
                             });
-            
+
                             tagsContainer.appendChild(testCasesContainer);
                         });
                     }
+
+
             
                     // Load XML on page load
                     //loadXML();

@@ -49,4 +49,7 @@
     <testCase id="40128" name="Create Apps Configuration 48" tags="Tag1,Tag2,Tag5"/>
     <testCase id="40129" name="Create Apps Configuration 49" tags="Tag1,Tag2,Tag5"/>
     <testCase id="40130" name="Create Apps Configuration 50" tags="Tag1,Tag2,Tag5"/>
+    <testCase id="40131" name="Without ta test case 1" tags=""/>
+    <testCase id="40131" name="Without ta test case 2" tags=""/>
+    <testCase id="40132" name="Without ta test case 3" tags=""/>
 </tagsMapping>
