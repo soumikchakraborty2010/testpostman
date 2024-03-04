@@ -1,0 +1,22 @@
+name: Open Site on PR Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  open-site:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Open Site on PR Merge
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.base.ref == 'develop'
+        run: |
+          if [ "${{ github.event.pull_request.merged }}" == "true" ]; then
+            echo "PR merged into develop branch. Opening site..."
+            open https://github.rds.lexmark.com/pages/MSE/CFM-E2E-UI-Automation/
+          fi
