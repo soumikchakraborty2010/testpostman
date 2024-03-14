@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Case Management</title>
+    <style>
+
+        body, .tabs, .tab, .tab-content, .tree-view, .grid-container, .filters, select, table, th, td {
+            font-size: 13px;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            cursor: pointer;
+            text-align: center;
+            background-color: #555;
+            color: white;
+            border: 1px solid #777;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .tab:hover {
+            background-color: #777;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tree-view, .grid-container {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .tree-view {
+            padding: 10px;
+        }
+
+        .tree-view ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .tree-view li {
+            padding: 5px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s;
+            font-weight: normal;
+        }
+
+        .tree-view li:hover {
+            background-color: #f9f9f9;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto auto auto auto auto;
+            grid-gap: 5px;
+            padding: 5px;
+            position: relative;
+            overflow: auto;
+            max-height: 80vh; 
+            overflow-x: auto;
+        }
+
+
+        .grid-header {
+            text-align: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            background-color: #f2f2f2;
+        }
+
+        .grid-header {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        th {
+            text-align: center;
+            padding: 10px;
+            /* border-bottom: 1px solid #ddd; */
+            border-bottom: 2px solid #cccccc;
+            background-color: #eafaea;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            font-size: 14px;
+        }
+
+        .grid-header input {
+            margin-right: 5px;
+        }
+
+
+        .filters {
+            font-family: 'Arial', sans-serif;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .filters select {
+            font-family: 'Arial', sans-serif;
+            padding: 8px;
+            margin-right: 10px; 
+            width: 300px; 
+            /* font-size: 14px; */
+            position: relative;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        /* Updated selection style */
+        .filters select:after {
+            font-family: 'Arial', sans-serif;
+            content: '\25BC';
+            /* font-size: 14px; */
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .filters select#tagFilter {
+            padding: 8px;
+            margin-right: 10px;
+            width: 300px; 
+            position: relative;
+        }
+
+        /* Updated selection style */
+        .filters select#tagFilter:after {
+            content: '\25BC'; /* Downward-pointing triangle (Unicode character) */
+            /* font-size: 14px;  */
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none; /* Ensure the arrow doesn't interfere with the select box */
+        }
+
+        .filters select#suiteFilter {
+            margin-right: 0;
+            width: 300px;
+        }
+
+        select {
+            padding: 8px;
+            margin-right: 10px;
+            width: 150px;
+        }
+
+        .tree-view .collapsed {
+            display: none;
+        }
+
+        .tree-view li.selected {
+            background-color: #c7ecc7; /* Light greenish color */
+            font-weight: bold; /* Bold font weight */
+        }
+
+        .tree-view a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-top: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+        }
+
+        .table-container {
+            width: calc(100%);
+            /* width: 100%;  */
+            height: 100%; /* Set the height as per your design */
+            overflow: auto; /* Enable both vertical and horizontal scrolling */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 5px;
+            background-color: #ffffff;
+            white-space: nowrap;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            white-space: nowrap; /* Prevent line breaks within table cells */
+            overflow: hidden; /* Hide content that overflows the cell */
+            text-overflow: ellipsis; /* Display ellipsis (...) for overflowed content */
+        }
+
+        th:nth-child(1), td:nth-child(1) {
+            width: 50px; /* Adjust the width as needed */
+        }
+
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr td:first-child {
+            text-align: center;
+        }
+
+        .tab.active {
+            background-color: #4CAF50; /* Green color (you can change this) */
+        }
+
+        /* Add this rule to style the selected row */
+        tbody tr.selected {
+            /* background-color: #c7ecc7;  */
+            background-color: #f0f0f0;
+            /* font-weight: bold;  */
+        }
+
+        /* New styles for the action menu */
+        .action-menu {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px; /* Adjust as needed */
+            margin-top: -10px; 
+            width: 210px;
+            z-index: 2;
+        }
+
+        .menu-button {
+            background-color: #555;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 210px;
+            z-index: 2;
+            height: 32.64px;
+        }
+
+        .menu-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            width: 210px;
+            z-index: 3;
+        }
+
+        .menu-option {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 3;
+        }
+
+        .menu-option:hover {
+            background-color: #ddd;
+        }
+
+        /* Show the menu content on hover */
+        .action-menu:hover .menu-content {
+            display: block;
+        }
+
+        /* Styles for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 0;
+            width: 80%;
+            max-width: 800px;
+            min-width: 320px; 
+            height: 40%;
+            /* max-height: 400px;  */
+            max-height: calc(800px / 2); 
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Styles for the overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Styles for the modal title */
+        .modal-title {
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #555;
+            color: #fff;
+            padding: 10px; 
+            margin: 0;
+            text-align: left;
+            width: calc(100% - 20px); 
+            line-height: 1; 
+            margin-bottom: 10px;
+        }
+
+
+        .modal-content {
+            display: flex;
+            flex-direction: row;
+        }
+
+
+        .left-control,
+        .right-control {
+            flex: 1;
+            margin: 0 10px;
+            width: 50%;
+        }
+
+        .second-multi-select-container {
+            margin-top: 20px; 
+            width: 100%;
+        }
+
+        .text-box-container {
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        select,
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-container label {
+            margin-left: 5px;
+        }
+
+        /* Close button styles */
+        .close-btn {
+            cursor: pointer;
+            color: #fff;
+            font-size: 14px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 10px; 
+            background-color: #28a745; 
+            border: none;
+            line-height: 1;
+            /* border-radius: 8px; */
+        }
+
+        .close-btn-errorMsg {
+            padding: 10px 20px; /* Add padding to the button */
+            background-color: #ccc;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #f00;
+        }
+
+        .modal #addNewTagCheckbox {
+            margin-top: 0px;
+            margin-left: 0px;
+        }
+
+        .modal #newTagTextbox {
+            margin-top: 0px; 
+        }
+
+        .modal .second-multi-select-container {
+            margin-top: -1px; 
+        }
+
+        .modal #secondMultiSelect {
+            height: 150px; 
+        }
+
+        .modal #multiSelect {
+            height: 214px; 
+        }
+
+        .modal #multiSelect option:checked 
+        .modal #secondMultiSelect option:checked {
+            background-color: #f5f5f5 !important; /* Add !important to ensure it takes precedence */
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modal dialog */
+        .modal-dialog {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center; /* Center-align content */
+        }
+
+        .error-message {
+            margin-bottom: 20px; 
+        }
+
+        /* .selected {
+            background-color: rgb(222, 246, 232);
+        } */
+
+        .radio-options {
+            margin-top: 10px;
+        }
+
+        .radio-options input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        .radio-options label {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        #generateDraftBtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            width: 60%; 
+        }
+
+        #generateDraftBtn:hover {
+            background-color: #45a049;
+        }
+
+
+        /* Styles for the modal */
+        .modal-msg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            z-index: 1000; /* Ensure modal is on top of other content */
+            overflow: auto; /* Enable scrolling if content overflows */
+        }
+
+        .modal-msg-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: max-content;
+            max-width: 80%;
+            height: max-content;
+            max-height: 80vh;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 10000;
+            align-items: center; /* Align items horizontally */
+        }
+
+        .modal-msg-content .modal-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal-msg-content .modal-msg-close-btn {
+            font-size: 1.2em;
+            cursor: pointer;
+            color: green;
+            border: none;
+            background: none;
+            outline: none;
+            margin-bottom: auto; /* Align close button to bottom */
+        }
+
+        .modal-msg-close-btn {
+            color: red; /* Red color for the button text */
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1;
+            background-color: green; /* Green color for the close button */
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-msg-content .modal-body {
+            font-size: 1em;
+            margin-bottom: auto; /* Align modal message body to bottom */
+            margin-top: 10px;
+        }
+
+        /* Prevent background from being clickable when modal is open */
+        body.modal-open {
+            overflow: hidden; /* Disable scrolling on the background */
+        }
+
+        .modal-msg-close-btn:hover,
+        .modal-msg-close-btn:focus {
+            color:white; /* Red color for the button text */
+            text-decoration: none;
+            background-color: green; /* Green color for the close button */
+            outline: none; /* Remove default focus outline */
+        }
+    </style>
+</head>
+<body>
+    <div class="tabs">
+        <div class="tab" onclick="handleTabClick('tree-tab')" data-tab="tree-tab">View Test Cases by Tags</div>
+        <div class="tab" onclick="handleTabClick('grid-tab')" data-tab="grid-tab">Update Tags</div>
+        <div class="tab" onclick="handleTabClick('generate-xml-tab')" data-tab="generate-xml-tab">Generate XML</div>
+    </div>
+    
+    <div id="tree-tab" class="tab-content">
+        <div class="tree-view" id="treeView">
+            <!-- Tree view content will be dynamically generated using JavaScript -->
+        </div>
+    </div>
+    
+    <div id="grid-tab" class="tab-content">
+        <div class="filters">
+            <select id="tagFilter">
+                <!-- Tags will be dynamically populated using JavaScript -->
+            </select>
+            <select id="suiteFilter">
+                <!-- Suite names will be dynamically populated using JavaScript -->
+            </select>
+            <div class="action-menu">
+                <button class="menu-button">Actions</button>
+                <div class="menu-content">
+                    <div id="appendNewTagOption" class="menu-option">Append a new Tag to selected Test cases</div>
+                    <div id="updateExistingTagsOption" class="menu-option">Update existing Tags on selected Test Cases</div>
+                    <div id="replaceExistingTagsOption" class="menu-option">Replace existing Tags with a new Tag</div>
+                    <div id="deleteSelectedTestCasesOption" class="menu-option">Delete selected Test cases</div>
+                    <div id="reloadDefaultsOption" class="menu-option">Reload from XML</div>
+                </div>                
+            </div>
+        </div>
+        <div class="grid-container" id="gridContainer">
+            <div class="table-container">
+                <table>
+                    <thead class="grid-header">
+                        <tr class="grid-header">
+                            <th>Select</th>
+                            <th>Test Case ID</th>
+                            <th>Robot Test Name</th>
+                            <th>Robot Suite Name</th>
+                            <th>Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+            <!-- Grid content will be dynamically generated using JavaScript -->
+        </div>
+        <div id="selectedItemCount"></div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal">
+        <div class="modal-title">Update Tags</div>
+        <div class="modal-content">
+            <div class="left-control">
+                <label for="multiSelect">Select from Existing Tags:</label>
+                <select id="multiSelect" multiple size="10">
+                </select>
+                <div class="radio-options">
+                    <input type="radio" id="replaceTags" name="tagOption" value="replace" checked>
+                    <label for="replaceTags">Overwrite current tags with selected tags</label><br>
+            
+                    <input type="radio" id="appendTags" name="tagOption" value="append">
+                    <label for="appendTags">Add selected tags to current tags</label><br>
+                </div>
+            </div>
+            <div class="right-control">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="addNewTagCheckbox" />
+                    <label for="addNewTagCheckbox">Add New Tag</label>
+                </div>
+    
+                <div class="text-box-container">
+                    <input type="text" id="newTagTextbox" placeholder="Enter new tag" disabled />
+                </div>
+    
+                <div class="second-multi-select-container">
+                    <label for="secondMultiSelect">Select New Tags:</label>
+                    <select id="secondMultiSelect" multiple size="10">
+                    </select>
+                </div>
+                <button id="generateDraftBtn">Copy to Generate XML table</button>
+            </div>
+            <!-- Close button -->
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2></h2>
+            <!-- Add your controls/operations here -->
+        </div>
+        <div class="modal-overlay" id="modalOverlay">
+            <!-- Modal dialog -->
+            <div class="modal-dialog">
+                <!-- Error message -->
+                <p class="error-message" id="errorMessage">Tags with spaces are not allowed. Use hyphen (-) instead.</p>
+                <!-- Close button -->
+                <button class="close-btn-errorMsg" onclick="closeModalOverlay()">Close</button>
+            </div>
+        </div>
+    </div>
+    <div id="generate-xml-tab" class="tab-content">
+        <div class="grid-container" id="generate-xml-tab-container">
+            <div class="table-container">
+                <table>
+                    <thead class="grid-header">
+                        <tr class="grid-header">
+                            <th>Select</th>
+                            <th>Test Case ID</th>
+                            <th>Robot Test Name</th>
+                            <th>Robot Suite Name</th>
+                            <th>New Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyXML"></tbody>
+                </table>
+            </div>
+            <!-- Grid content will be dynamically generated using JavaScript -->
+        </div>
+    </div>
+    <div class="modal-msg" id="mainModal">
+        <div class="modal-msg-content">
+            <!-- Close button -->
+            <span class="modal-msg-close-btn" onclick="closeMainModal()">&times;</span>
+            <!-- Modal title -->
+            <!-- <div class="modal-title">No Data Found</div> -->
+            <!-- Modal content -->
+            <div class="modal-body">
+                <!-- Your modal content here -->
+                <!-- For example, error message -->
+                <p id="mainModalMessage"></p>
+            </div>
+        </div>
+    </div>
+<script>
+
+    // Declare xmlDoc as a global variable
+    var xmlDoc;
+    var selectedRowCount;
+
+    function openTab(tabName) {
+        var tabs = document.getElementsByClassName('tab-content');
+        for (var i = 0; i < tabs.length; i++) {
+            tabs[i].style.display = 'none';
+        }
+        document.getElementById(tabName).style.display = 'block';
+    }
+
+
+    // Function to fetch and parse the XML file
+    function fetchAndParseXML() {
+        fetch('poc.xml')
+            .then(response => response.text())
+            .then(xmlString => {
+                // Parse the XML string
+                var parser = new DOMParser();
+                xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+
+                // Call functions to generate tree view, populate filters, and fill the grid
+                generateTreeView(xmlDoc);
+                populateFilters(xmlDoc);
+                fillGrid(xmlDoc);
+                setTooltips();
+
+                // Call the function to generate unique tags list
+                generateUniqueTagsList(xmlDoc);
+                getUniqueSuiteNames(xmlDoc);
+                generateUniqueTagsListInModal();
+                
+            })
+            .catch(error => console.error('Error fetching XML:', error));
+    }
+
+    // Use DOMContentLoaded instead of window.onload
+    document.addEventListener('DOMContentLoaded', fetchAndParseXML);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add event listener for addNewTagCheckbox
+        var addNewTagCheckbox = document.getElementById('addNewTagCheckbox');
+        var newTagTextbox = document.getElementById('newTagTextbox');
+        addNewTagCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Enable newTagTextbox and clear default text
+                newTagTextbox.disabled = false;
+                newTagTextbox.placeholder = '';
+            } else {
+                // Disable newTagTextbox and set default text
+                newTagTextbox.disabled = true;
+                newTagTextbox.value = '';
+                newTagTextbox.placeholder = 'Enter new tag';
+            }
+        });
+
+        // Add event listener for input on newTagTextbox
+        newTagTextbox.addEventListener('input', function(event) {
+            // Check for spaces
+            if (event.target.value.includes(' ')) {
+                // Provide user feedback by changing border color
+                newTagTextbox.style.borderColor = 'red';
+                showModal("Tags with spaces are not allowed. Use hyphen (-) instead.");
+            } else {
+                // Reset border color if no spaces
+                newTagTextbox.style.borderColor = '';
+            }
+        });
+
+        newTagTextbox.addEventListener('keydown', function(event) {
+            // Check if the key pressed is Enter
+            if (event.key === 'Enter') {
+                // Check for spaces
+                if (this.value.includes(' ')) {
+                    console.log("it has spaces");
+                    // Prevent default action (e.g., form submission)
+                    event.preventDefault();
+                    // Change the border color after the default action is prevented
+                    this.style.borderColor = 'red';
+                    showModal("Tags with spaces are not allowed. Use hyphen (-) instead.");
+                    // Focus the element to make sure it retains visual focus
+                    this.focus();
+                } else {
+                    this.style.borderColor = '';
+                    if(checkExistingTag(this.value)){
+                        showModal("Already an existing Tags list ! Please choose a unique name.");
+                    }else {
+                        if(this.value.trim() !== ""){
+                            addToSecondMultiSelect(this.value,newTagTextbox);
+                        }
+                    }
+                    // Reset border color if no spaces
+                    
+                }
+            }
+        });
+
+        var multiSelect = document.getElementById('multiSelect');
+        var secondMultiSelect = document.getElementById('secondMultiSelect');
+        // Add event listener for multiSelect
+        multiSelect.addEventListener('click', function() {
+            var selectedItem = event.target;
+            if (selectedItem.tagName === 'OPTION') {
+                toggleHighlight(selectedItem);
+            }
+            // var selectedOption = this.options[this.selectedIndex];
+            // toggleHighlight(selectedOption);
+        });
+
+        // Add event listener for secondMultiSelect
+        secondMultiSelect.addEventListener('click', function() {
+            var selectedItem = event.target;
+            if (selectedItem.tagName === 'OPTION') {
+                toggleHighlight(selectedItem);
+            }
+            // var selectedOption = this.options[this.selectedIndex];
+            // toggleHighlight(selectedOption);
+        });
+
+        // Function to toggle highlight
+        function toggleHighlight(option) {
+            if (option.classList.contains('selected')) {
+                option.classList.remove('selected');
+            } else {
+                option.classList.add('selected');
+            }
+        }
+
+    });   
+
+    // Function to generate unique tags list
+    function generateUniqueTagsList(xmlDoc) {
+        // Check if xmlDoc is defined
+        if (!xmlDoc) {
+            console.error('XML document is not defined');
+            return;
+        }
+
+        // Get all unique tags from XML, including empty tags
+        var tagsSet = new Set();
+        xmlDoc.querySelectorAll('testCase[tags]').forEach(testCase => {
+            testCase.getAttribute('tags').split(',').forEach(tag => {
+                tagsSet.add(tag.trim());
+            });
+        });
+
+        // Check if there are test cases without tags
+        // var hasNoTags = xmlDoc.querySelectorAll('testCase:not([tags])').length > 0;
+        var hasNoTags = xmlDoc.querySelectorAll('testCase[tags=""], testCase:not([tags])').length > 0;
+
+
+        // Convert Set to array
+        var tagsArray = Array.from(tagsSet);
+
+        // Add "No Tags" if there are test cases without tags
+        if (hasNoTags) {
+            tagsArray = tagsArray.filter(tag => tag !== ''); // Exclude empty string
+            tagsArray.push('No Tags');
+            
+        }
+        // Add the default tag "All Tags"
+        tagsArray.unshift('All Tags');
+        populateFilters(tagsArray);
+        // Log the tags list to the console
+        // generateUniqueTagsListInModal(tagsArray);
+        return tagsArray;
+    }
+
+    var existingTagsArrayForModal;
+    // Function to generate unique tags list for modal
+    function generateUniqueTagsListInModal() {
+
+        existingTagsArrayForModal = generateUniqueTagsList(xmlDoc);
+        // Check if 'No Tags' is in the array and remove it
+        var indexOfNoTags = existingTagsArrayForModal.indexOf('No Tags');
+        if (indexOfNoTags !== -1) {
+            existingTagsArrayForModal.splice(indexOfNoTags, 1);
+        }
+
+        // Check if 'All Tags' is in the array and remove it
+        var indexOfAllTags = existingTagsArrayForModal.indexOf('All Tags');
+        if (indexOfAllTags !== -1) {
+            existingTagsArrayForModal.splice(indexOfAllTags, 1);
+        }
+        // Log the tags list to the console
+        console.log(existingTagsArrayForModal);
+        return existingTagsArrayForModal;
+    }
+
+    // Function to get unique Robot Suite Names from the XML data
+    function getUniqueSuiteNames(xmlDoc) {
+        // Check if xmlDoc is defined
+        if (!xmlDoc) {
+            console.error('XML document is not defined');
+            return [];
+        }
+
+        // Get all unique suite names from XML
+        var suiteNamesSet = new Set();
+        xmlDoc.querySelectorAll('testCase[suite]').forEach(testCase => {
+            suiteNamesSet.add(testCase.getAttribute('suite').trim());
+        });
+
+        // Convert Set to array
+        var uniqueSuiteNames = Array.from(suiteNamesSet);
+        uniqueSuiteNames.unshift('All Suites');
+        // Log the unique suite names to the console
+        // console.log('Unique Suite Names:', uniqueSuiteNames);
+
+        return uniqueSuiteNames;
+    }
+
+    // Function to populate suiteFilter
+    function populateSuiteFilter(suiteNamesArray) {
+        // Get the #suiteFilter element
+        var suiteFilter = document.getElementById('suiteFilter');
+
+        // Clear existing options
+        suiteFilter.innerHTML = '';
+
+        // Add options to the suiteFilter
+        suiteNamesArray.forEach(suiteName => {
+            var option = document.createElement('option');
+            option.value = suiteName;
+            option.textContent = suiteName;
+            suiteFilter.appendChild(option);
+        });
+
+        // Set the default selection for suiteFilter
+            suiteFilter.value = 'All Suites';
+            // Add event listener for suite filter changes
+            suiteFilter.addEventListener('change', function () {
+            filterBySuite(suiteFilter.value);
+        });
+    }
+
+        // Call the function when the page loads
+    window.onload = function () {
+        fetchAndParseXML(); // Fetch and parse XML
+        generateUniqueTagsList(xmlDoc); // Generate and log unique tags list
+        getUniqueSuiteNames(xmlDoc);
+    };
+
+    // Function to generate tree view
+    function generateTreeView(xmlDoc) {
+        // Get the unique tags from XML
+        var tags = Array.from(new Set(Array.prototype.concat(...Array.from(xmlDoc.querySelectorAll('testCase[tags]'))
+            .map(testCase => testCase.getAttribute('tags').split(',')))))
+            .filter(tag => tag.trim() !== ''); // Filter out empty tags
+
+        // Get the #treeView element
+        var treeView = document.getElementById('treeView');
+
+        // Create a UL element for the tree view
+        var ul = document.createElement('ul');
+
+        // Add "No Tags" category
+        var noTagsLi = document.createElement('li');
+        noTagsLi.classList.add('no-tags', 'bold'); // Add class for specific styling
+        noTagsLi.textContent = 'No Tags';
+
+        // Create a UL element for test cases without tags
+        var noTagsUl = document.createElement('ul');
+
+        // Get test cases without tags
+        var testCasesNoTags = xmlDoc.querySelectorAll('testCase[tags=""]');
+        testCasesNoTags.forEach(testCase => {
+            var testCaseLi = document.createElement('li');
+            var testCaseLink = document.createElement('a');
+            var id = testCase.getAttribute('id');
+            testCaseLink.href = `https://dev.azure.com/OneLexmark/OneLexmarkCloud/_workitems/edit/${id}`;
+            testCaseLink.textContent = `${id} : ${testCase.getAttribute('name')}`;
+            testCaseLi.appendChild(testCaseLink);
+            noTagsUl.appendChild(testCaseLi);
+        });
+
+        // Append the test cases without tags to the "No Tags" category
+        noTagsLi.appendChild(noTagsUl);
+
+        // Append the "No Tags" category to the main UL
+        ul.appendChild(noTagsLi);
+
+        // Iterate through each unique tag and create a tree node
+        tags.forEach(tag => {
+            // Create a LI element for each tag
+            var li = document.createElement('li');
+            li.textContent = tag;
+
+            // Create a UL element for the test cases associated with the tag
+            var testCaseUl = document.createElement('ul');
+            testCaseUl.classList.add('collapsed'); // Collapse the test cases by default
+
+            // Get the test cases with the current tag
+            var testCases = xmlDoc.querySelectorAll(`testCase[tags*="${tag}"]`);
+
+            // Iterate through each test case and create a tree node
+            testCases.forEach(testCase => {
+                var testCaseLi = document.createElement('li');
+                // Create a hyperlink for each ID with the specified URL
+                var testCaseLink = document.createElement('a');
+                var id = testCase.getAttribute('id');
+                testCaseLink.href = `https://dev.azure.com/OneLexmark/OneLexmarkCloud/_workitems/edit/${id}`;
+                testCaseLink.textContent = `${id} : ${testCase.getAttribute('name')}`;
+                testCaseLi.appendChild(testCaseLink);
+                testCaseUl.appendChild(testCaseLi);
+            });
+
+            // Append the test case UL to the tag LI
+            li.appendChild(testCaseUl);
+
+            // Add click event listener to toggle the collapse/expand state and handle tag selection
+            li.addEventListener('click', function () {
+                testCaseUl.classList.toggle('collapsed');
+                li.classList.toggle('selected');
+            });
+
+            // Append the tag LI to the main UL
+            ul.appendChild(li);
+        });
+
+        // Update the tree view with the generated content
+        treeView.innerHTML = '';
+        treeView.appendChild(ul);
+
+        // Add click event listener to toggle the collapse/expand state for "No Tags"
+        noTagsLi.addEventListener('click', function () {
+            noTagsUl.classList.toggle('collapsed');
+            noTagsLi.classList.toggle('selected');
+        });
+    }
+
+    var updateTagsTabClicked = false;
+
+    // Function to populate filters
+    function populateFilters(tagsArray) {
+        if (updateTagsTabClicked) {
+            // Get the #tagFilter element
+            var tagFilter = document.getElementById('tagFilter');
+
+            // Clear existing options
+            tagFilter.innerHTML = '';
+
+            // Add options to the tag filter
+            tagsArray.forEach(tag => {
+                var option = document.createElement('option');
+                option.value = tag;
+                option.textContent = tag;
+                tagFilter.appendChild(option);
+            });
+
+            // Set the default selection for tagFilter
+            tagFilter.value = 'All Tags';
+
+            // Add event listener for tag filter changes
+            tagFilter.addEventListener('change', function () {
+                filterByTag(tagFilter.value);
+            });
+        }
+    }
+
+    // Function to handle tab click
+    function handleTabClick(tabName) {
+        openTab(tabName);
+
+        // Remove 'active' class from all tabs
+        var tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => tab.classList.remove('active'));
+
+        // Add 'active' class to the clicked tab
+        document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+
+        if (tabName === 'grid-tab') {
+            generateUniqueTagsList(xmlDoc);
+            updateTagsTabClicked = true;
+            var tagsArray = generateUniqueTagsList(xmlDoc);
+            populateFilters(tagsArray);
+            var suiteNamesArray = getUniqueSuiteNames(xmlDoc); // Get unique suite names
+            populateSuiteFilter(suiteNamesArray); // Populate suiteFilter
+        }else if (tabName === 'generate-xml-tab'){
+            var tableBodyXMLData = document.getElementById('tableBodyXML');
+            if (tableBodyXMLData.rows.length === 0) {
+                // No data present
+                console.log("No data in tableBodyXML");
+                showMainModal("No data is present in this page yet ! Add items to this page prior accessing this.");
+                handleTabClick('tree-tab');
+            } else {
+                // Data present
+                console.log("Data found in tableBodyXML");
+            }
+            
+        }
+    }
+
+
+    function fillGrid(xmlDoc) {
+        // Get the #tableBody element
+        var tableBody = document.getElementById('tableBody');
+
+        // Clear existing content
+        tableBody.innerHTML = '';
+
+        // Get test cases from XML
+        var testCases = xmlDoc.querySelectorAll('testCase');
+
+        // Iterate through each test case and populate the table body
+        testCases.forEach(testCase => {
+            var row = document.createElement('tr');
+
+            // Checkbox for selection
+            var checkboxCell = document.createElement('td');
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.addEventListener('change', function () {
+                handleSelectChange(checkbox);
+            });
+            checkboxCell.appendChild(checkbox);
+            row.appendChild(checkboxCell);
+
+            // Test Case ID
+            var idCell = document.createElement('td');
+            idCell.textContent = testCase.getAttribute('id');
+            row.appendChild(idCell);
+
+            // Robot Test Name
+            var nameCell = document.createElement('td');
+            nameCell.textContent = testCase.getAttribute('name');
+            row.appendChild(nameCell);
+
+            // Robot Suite Name
+            var suiteCell = document.createElement('td');
+            suiteCell.textContent = testCase.getAttribute('suite');
+            row.appendChild(suiteCell);
+
+            // Tags column
+            var tagsCell = document.createElement('td');
+            var tags = testCase.getAttribute('tags') || 'No Tags';
+            tagsCell.textContent = tags;
+            row.appendChild(tagsCell);
+
+            // Append the row to the table body
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Function to handle checkbox change
+    function handleSelectChange(checkbox) {
+        var row = checkbox.closest('tr');
+        row.classList.toggle('selected', checkbox.checked);
+
+        // Update the count of selected items
+        updateSelectedItemCount();
+    }
+
+    // Function to set tooltips for each cell in the table
+    function setTooltips() {
+        var tableCells = document.querySelectorAll('.grid-container tbody tr td');
+
+        tableCells.forEach(cell => {
+            cell.setAttribute('title', cell.textContent.trim());
+        });
+    }
+
+
+    // Function to filter rows based on the selected tag
+    function filterByTag(tag) {
+        // Get all rows in the table body
+        var rows = document.querySelectorAll('.grid-container tbody tr');
+
+        // Iterate through each row
+        rows.forEach(row => {
+            var tagsCell = row.querySelector('td:nth-child(5)'); // Assuming the "Tags" column is the fifth column (index 4)
+            var tags = tagsCell.textContent.trim();
+
+            // Check if the row contains the selected tag or if it's a "No Tags" row
+            if ((tag === 'All Tags') || (tag === 'No Tags' && row.classList.contains('no-tags')) || tags.includes(tag)) {
+                row.style.display = ''; // Show the row
+            } else {
+                row.style.display = 'none'; // Hide the row
+            }
+        });
+        document.getElementById('suiteFilter').value = 'All Suites';
+        updateSelectedItemCount();
+    }
+
+
+    // Function to filter rows based on the selected suite
+    function filterBySuite(suite) {
+        // Get all rows in the table body
+        var rows = document.querySelectorAll('.grid-container tbody tr');
+
+        // Iterate through each row
+        rows.forEach(row => {
+            var suiteCell = row.querySelector('td:nth-child(4)'); // Assuming the "Robot Suite Name" column is the fourth column (index 3)
+            var suiteName = suiteCell.textContent.trim();
+
+            // Check if the row contains the selected suite or if it's an "All Suites" row
+            if ((suite === 'All Suites') || (suite === 'No Suites' && row.classList.contains('no-suites')) || suiteName.includes(suite)) {
+                row.style.display = ''; // Show the row
+            } else {
+                row.style.display = 'none'; // Hide the row
+            }
+        });
+        document.getElementById('tagFilter').value = 'All Tags';
+        updateSelectedItemCount();
+    }
+
+    // Function to update the count of selected items
+    function updateSelectedItemCount() {
+        // Get the count of selected rows
+        selectedRowCount = document.querySelectorAll('.grid-container tbody tr.selected').length;
+
+        // Display the count under the gridContainer
+        var countInfo = document.getElementById('selectedItemCount');
+        countInfo.textContent = `${selectedRowCount} of items are currently selected`;
+    }
+
+
+    // function appendNewTag() {
+    //     // Get the count of selected rows
+    //     selectedRowCount = document.querySelectorAll('.grid-container tbody tr.selected').length;
+
+    //     // Check if there are selected rows
+    //     if (selectedRowCount > 0) {
+    //         // Your logic for appending a new tag to selected test cases
+    //         // ...
+
+    //         // Optionally, you can display a message to the user
+    //         // console.log('Appending new tag to selected test cases.');
+    //     } else {
+    //         // Display a message or take any other action when no rows are selected
+    //         // console.log('Please select at least one row before appending a new tag.');
+    //     }
+    // }
+
+    function appendNewTag() {
+        // Get the count of selected rows
+        const selectedRowCount = document.querySelectorAll('.grid-container tbody tr.selected').length;
+
+        // Check if there are selected rows
+        if (selectedRowCount > 0) {
+            // Show the overlay and modal
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('modal').style.display = 'block';
+            launchModal();
+
+            // Optionally, you can display a message to the user
+            // console.log('Appending new tag to selected test cases.');
+        } else {
+            // Display a message or take any other action when no rows are selected
+            // console.log('Please select at least one row before appending a new tag.');
+        }
+    }
+
+    function launchModal() {
+        // ... (your existing modal launching code)
+
+        // Read existingTagsArrayForModal and populate the multiSelect element
+        var multiSelectElement = document.getElementById('multiSelect');
+
+        // Clear existing options
+        multiSelectElement.innerHTML = '';
+
+        // Populate with new options
+        existingTagsArrayForModal.forEach(function(tag) {
+            var option = document.createElement('option');
+            option.value = tag;
+            option.text = tag;
+            multiSelectElement.appendChild(option);
+        });
+
+        // ... (other modal setup code)
+    }
+
+
+
+    // Function to close the modal
+    function closeModal() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('modal').style.display = 'none';
+        enableScroll(); 
+    }
+
+    // Function to close the modal
+    function closeModalOverlay() {
+        var modalOverlay = document.getElementById('modalOverlay');
+        modalOverlay.style.display = 'none';
+    }
+
+    function closeMainModal() {
+        var mainModal = document.getElementById('mainModal');
+        mainModal.style.display = 'none';
+        document.body.classList.remove('modal-open'); // Remove class to enable scrolling on background
+    }
+
+    // Assuming you have an element representing each menu option
+    var appendNewTagOption = document.getElementById('appendNewTagOption');
+    var updateExistingTagsOption = document.getElementById('updateExistingTagsOption');
+    var replaceExistingTagsOption = document.getElementById('replaceExistingTagsOption');
+    var deleteSelectedTestCasesOption = document.getElementById('deleteSelectedTestCasesOption');
+
+    // Add event listeners to call the corresponding functions when options are clicked
+    appendNewTagOption.addEventListener('click', appendNewTag);
+    updateExistingTagsOption.addEventListener('click', updateExistingTags);
+    replaceExistingTagsOption.addEventListener('click', replaceExistingTags);
+    deleteSelectedTestCasesOption.addEventListener('click', deleteSelectedTestCases);
+
+
+    // Function to display the modal
+    function showModal(message) {
+        var mainModal = document.getElementById('mainModal');
+        var mainModalMessage = document.getElementById('mainModalMessage');
+        mainModalMessage.textContent = message;
+        mainModal.style.display = 'flex';
+        disableScroll();
+    }
+
+    // Function to display a modal on the main HTML page
+    function showMainModal(message) {
+        var mainModal = document.getElementById('mainModal');
+        var mainModalMessage = document.getElementById('mainModalMessage');
+        mainModalMessage.textContent = message;
+        mainModal.style.display = 'block';
+        document.body.classList.add('modal-open'); // Add class to disable scrolling on background
+    }
+
+    // Function to check if the tag already exists
+    function checkExistingTag(tag) {
+        // var existingTagsArrayForModal = existingTagsArrayForModal; // Example array of existing tags
+        return existingTagsArrayForModal.includes(tag);
+    }
+
+    // Function to add a value to secondMultiSelect if it does not already exist
+    function addToSecondMultiSelect(value,HTMLElement) {
+        var secondMultiSelect = document.getElementById('secondMultiSelect');
+        var exists = false;
+        for (var i = 0; i < secondMultiSelect.options.length; i++) {
+            if (secondMultiSelect.options[i].value === value) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            var option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            secondMultiSelect.appendChild(option);
+            HTMLElement.value = '';
+        } else {
+            showModal("Already exists in New Tags list ! Please choose a unique name.");
+        }
+    }
+
+    function disableScroll() {
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    }
+
+    function enableScroll() {
+        document.body.style.overflow = ''; // Enable scrolling
+    }
+
+</script>
+
+</body>
+</html>
