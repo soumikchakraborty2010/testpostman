@@ -882,10 +882,66 @@
 
             // If either of the selects has at least one item selected, proceed
             if (selectedMultiOptions.length > 0 || selectedSecondMultiOptions.length > 0) {
+
+                // Get the selected rows from tableBody
+                var tableBody = document.getElementById('tableBody');
+                var selectedRows = tableBody.querySelectorAll('tr.selected');
+
                 if (replaceTagsRadio.checked) {
+                    // Iterate over selected rows and update Tags column
+                    selectedRows.forEach(function(row) {
+                        var testCaseId = row.cells[1].textContent; // Assuming the second column is the Test Case ID
+                        var newTags = '';
+
+                        // Create comma-separated list of selected tags from multiSelect
+                        for (var i = 0; i < selectedMultiOptions.length; i++) {
+                            newTags += selectedMultiOptions[i].textContent + ', ';
+                        }
+
+                        // Create comma-separated list of selected tags from secondMultiSelect
+                        for (var j = 0; j < selectedSecondMultiOptions.length; j++) {
+                            newTags += selectedSecondMultiOptions[j].textContent + ', ';
+                        }
+
+                        // Trim trailing comma and space
+                        newTags = newTags.replace(/,\s*$/, '');
+
+                        // Update Tags column in the row
+                        row.cells[4].textContent = newTags;
+
+                        // Create new row for tableBodyXML
+                        var newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td>${row.cells[0].innerHTML}</td>
+                            <td>${row.cells[1].innerHTML}</td>
+                            <td>${row.cells[2].innerHTML}</td>
+                            <td>${row.cells[3].innerHTML}</td>
+                            <td>${newTags}</td>
+                        `;
+
+                        // Check if a row with the same Test Case ID already exists in tableBodyXML
+                        var existingRow = document.querySelector(`#tableBodyXML tr[data-id="${testCaseId}"]`);
+
+                        // If an existing row with the same Test Case ID exists, replace it; otherwise, append the new row
+                        if (existingRow) {
+                            existingRow.replaceWith(newRow);
+                        } else {
+                            var tableBodyXML = document.getElementById('tableBodyXML');
+                            tableBodyXML.appendChild(newRow);
+                        }
+                        // // Append the new row to tableBodyXML
+                        // var tableBodyXML = document.getElementById('tableBodyXML');
+                        // tableBodyXML.appendChild(newRow);
+                    });
                     console.log("Replace tags selected");
+
                     // Do something for replaceTags option
                 } else if (appendTagsRadio.checked) {
+
+                    // Call the function to append tags to selected rows
+                    appendTagsToSelectedRows(selectedRows, selectedMultiOptions, selectedSecondMultiOptions);
+
+
                     console.log("Append tags selected");
                     // Do something for appendTags option
                 }
@@ -897,6 +953,62 @@
         });
 
     });   
+
+
+    function appendTagsToSelectedRows(selectedRows, selectedMultiOptions, selectedSecondMultiOptions) {
+        // Iterate over selected rows
+        selectedRows.forEach(function(row) {
+            var testCaseId = row.cells[1].textContent.trim(); // Assuming the second column is the Test Case ID
+            var currentTags = row.cells[4].textContent.trim().split(','); // Split existing tags into an array
+
+            // Append selected tags from multiSelect
+            for (var i = 0; i < selectedMultiOptions.length; i++) {
+                var tag = selectedMultiOptions[i].textContent.trim();
+                if (!currentTags.includes(tag)) { // Check if tag already exists
+                    currentTags.push(tag); // Append tag if it doesn't exist
+                }
+            }
+
+            // Append selected tags from secondMultiSelect
+            for (var j = 0; j < selectedSecondMultiOptions.length; j++) {
+                var tag = selectedSecondMultiOptions[j].textContent.trim();
+                if (!currentTags.includes(tag)) { // Check if tag already exists
+                    currentTags.push(tag); // Append tag if it doesn't exist
+                }
+            }
+
+            // Join tags array back into a string
+            var newTags = currentTags.join(', ');
+
+            // Trim trailing comma and space
+            newTags = newTags.replace(/,\s*$/, '');
+
+            // Check if a row with the same Test Case ID already exists in tableBodyXML
+            var existingRow = document.querySelector(`#tableBodyXML tr[data-id="${testCaseId}"]`);
+
+            // Update Tags column in the row
+            row.cells[4].textContent = newTags;
+
+            // Create new row for tableBodyXML
+            var newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${row.cells[0].innerHTML}</td>
+                <td>${row.cells[1].innerHTML}</td>
+                <td>${row.cells[2].innerHTML}</td>
+                <td>${row.cells[3].innerHTML}</td>
+                <td>${newTags}</td>
+            `;
+
+            // If an existing row with the same Test Case ID exists, replace it; otherwise, append the new row
+            if (existingRow) {
+                existingRow.replaceWith(newRow);
+            } else {
+                var tableBodyXML = document.getElementById('tableBodyXML');
+                tableBodyXML.appendChild(newRow);
+            }
+        });
+    }
+
 
     // Function to generate unique tags list
     function generateUniqueTagsList(xmlDoc) {
