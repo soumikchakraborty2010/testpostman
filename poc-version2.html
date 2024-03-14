@@ -863,6 +863,39 @@
             }
         }
 
+            // Get the generateDraftBtn button element
+        var generateDraftBtn = document.getElementById('generateDraftBtn');
+        // Add event listener to the button
+        generateDraftBtn.addEventListener('click', function() {
+            console.log("button event");
+            // Check if at least one item is selected in multiSelect
+            var multiSelect = document.getElementById('multiSelect');
+            var selectedMultiOptions = multiSelect.selectedOptions;
+
+            // Check if at least one item is selected in secondMultiSelect
+            var secondMultiSelect = document.getElementById('secondMultiSelect');
+            var selectedSecondMultiOptions = secondMultiSelect.selectedOptions;
+
+            // Check which radio button is selected
+            var replaceTagsRadio = document.getElementById('replaceTags');
+            var appendTagsRadio = document.getElementById('appendTags');
+
+            // If either of the selects has at least one item selected, proceed
+            if (selectedMultiOptions.length > 0 || selectedSecondMultiOptions.length > 0) {
+                if (replaceTagsRadio.checked) {
+                    console.log("Replace tags selected");
+                    // Do something for replaceTags option
+                } else if (appendTagsRadio.checked) {
+                    console.log("Append tags selected");
+                    // Do something for appendTags option
+                }
+                console.log("Proceed");
+            } else {
+                // Show modal if no tags are selected
+                showMainModal("No tags selected! Please select a tag to proceed.");
+            }
+        });
+
     });   
 
     // Function to generate unique tags list
@@ -1314,7 +1347,6 @@
     function closeModal() {
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('modal').style.display = 'none';
-        enableScroll(); 
     }
 
     // Function to close the modal
@@ -1348,7 +1380,6 @@
         var mainModalMessage = document.getElementById('mainModalMessage');
         mainModalMessage.textContent = message;
         mainModal.style.display = 'flex';
-        disableScroll();
     }
 
     // Function to display a modal on the main HTML page
@@ -1385,14 +1416,6 @@
         } else {
             showModal("Already exists in New Tags list ! Please choose a unique name.");
         }
-    }
-
-    function disableScroll() {
-        document.body.style.overflow = 'hidden'; // Prevent scrolling
-    }
-
-    function enableScroll() {
-        document.body.style.overflow = ''; // Enable scrolling
     }
 
 </script>
