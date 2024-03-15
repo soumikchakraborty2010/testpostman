@@ -530,6 +530,37 @@
             background-color: #45a049;
         }
 
+        #deleteTestCaseBtn {
+            display: inline-block;
+            background-color: #c12038; /* Red background for delete button */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            width: 50%; /* Adjust width as needed */
+            text-align: center;
+        }
+
+        #cancelDeleteTestCaseBtn {
+            display: inline-block;
+            background-color: #4CAF50; /* Green background for cancel button */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            width: 50%; /* Adjust width as needed */
+            margin-left: 10px; /* Add a small margin between buttons */
+        }
+
+        #deleteTestCaseBtn:hover, #cancelDeleteTestCaseBtn:hover {
+            opacity:0.8; /* Reduce opacity on hover for both buttons */
+        }
 
         /* Styles for the modal */
         .modal-msg {
@@ -683,11 +714,9 @@
             <div class="action-menu">
                 <button class="menu-button">Actions</button>
                 <div class="menu-content">
-                    <div id="appendNewTagOption" class="menu-option">Append a new Tag to selected Test cases</div>
-                    <div id="updateExistingTagsOption" class="menu-option">Update existing Tags on selected Test Cases</div>
-                    <div id="replaceExistingTagsOption" class="menu-option">Replace existing Tags with a new Tag</div>
+                    <div id="appendUpdateTags" class="menu-option">Overwrite or Append tags</div>
                     <div id="deleteSelectedTestCasesOption" class="menu-option">Delete selected Test cases</div>
-                    <div id="reloadDefaultsOption" class="menu-option">Reload from XML</div>
+                    <div id="browseTestCases" class="menu-option">Browse XML</div>
                 </div>                
             </div>
         </div>
@@ -789,6 +818,24 @@
                 <!-- Your modal content here -->
                 <!-- For example, error message -->
                 <p id="mainModalMessage"></p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-msg" id="mainModalDeleteTC">
+        <div class="modal-msg-content">
+            <!-- Close button -->
+            <span class="modal-msg-close-btn" onclick="closeMainModal()">&times;</span>
+            <!-- Modal title -->
+            <!-- <div class="modal-title">No Data Found</div> -->
+            <!-- Modal content -->
+            <div class="modal-body">
+                <!-- Your modal content here -->
+                <!-- For example, error message -->
+                <p id="mainModalMessageDelete"></p>
+            </div>
+            <div class="modal-body">
+                <button id="deleteTestCaseBtn">Proceed</button>
+                <button id="cancelDeleteTestCaseBtn">Cancel</button>
             </div>
         </div>
     </div>
@@ -1498,6 +1545,21 @@
         }
     }
 
+    function deleteSelectedTestCases() {
+        // Get the count of selected rows
+        const selectedRowCount = document.querySelectorAll('.grid-container tbody tr.selected').length;
+
+        // Check if there are selected rows
+        if (selectedRowCount > 0) {
+            // Show the overlay and modal
+            // document.getElementById('overlay').style.display = 'block';
+            // document.getElementById('modal').style.display = 'block';
+            showModalForDeleteTC("Are you sure you want to delete the selected Test(s) from XML? Click Proceed to confirm.");
+        } else {
+
+        }
+    }
+
     function launchModal() {
         // ... (your existing modal launching code)
 
@@ -1539,22 +1601,27 @@
     }
 
     // Assuming you have an element representing each menu option
-    var appendNewTagOption = document.getElementById('appendNewTagOption');
-    var updateExistingTagsOption = document.getElementById('updateExistingTagsOption');
-    var replaceExistingTagsOption = document.getElementById('replaceExistingTagsOption');
+    var appendUpdateTags = document.getElementById('appendUpdateTags');
     var deleteSelectedTestCasesOption = document.getElementById('deleteSelectedTestCasesOption');
+    var browseTestCases = document.getElementById('browseTestCases');
 
     // Add event listeners to call the corresponding functions when options are clicked
-    appendNewTagOption.addEventListener('click', appendNewTag);
-    updateExistingTagsOption.addEventListener('click', updateExistingTags);
-    replaceExistingTagsOption.addEventListener('click', replaceExistingTags);
+    appendUpdateTags.addEventListener('click', appendNewTag);
     deleteSelectedTestCasesOption.addEventListener('click', deleteSelectedTestCases);
+    browseTestCases.addEventListener('click', browseTestCases);
 
 
     // Function to display the modal
     function showModal(message) {
         var mainModal = document.getElementById('mainModal');
         var mainModalMessage = document.getElementById('mainModalMessage');
+        mainModalMessage.textContent = message;
+        mainModal.style.display = 'flex';
+    }
+
+    function showModalForDeleteTC(message) {
+        var mainModal = document.getElementById('mainModalDeleteTC');
+        var mainModalMessage = document.getElementById('mainModalMessageDelete');
         mainModalMessage.textContent = message;
         mainModal.style.display = 'flex';
     }
