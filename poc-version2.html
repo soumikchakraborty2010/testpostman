@@ -850,6 +850,53 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="modal-NewTestCase">
+        <div class="modal-title">Add New Test case</div>
+        <div class="modal-content">
+            <div class="top-control">
+                <div class="text-box-container">
+                    <input type="text" id="newTestCaseIDTextbox" placeholder="Enter Test Case ID" enabled />
+                    <input type="text" id="newRobotTestNameTextbox" placeholder="Enter Robot Test Name" enabled />
+                    <input type="text" id="newRobotTestSuiteTextbox" placeholder="Enter Robot Test Suite" enabled />
+                </div>
+            </div>
+            <div class="left-control">
+                <label for="multiSelect">Select from Existing Tags:</label>
+                <select id="multiSelect" multiple size="10">
+                </select>
+            </div>
+            <div class="right-control">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="addNewTagCheckbox" />
+                    <label for="addNewTagCheckbox">Add New Tag</label>
+                </div>
+    
+                <div class="text-box-container">
+                    <input type="text" id="newTagTextbox" placeholder="Enter new tag" disabled />
+                </div>
+    
+                <div class="second-multi-select-container">
+                    <label for="secondMultiSelect">Select New Tags:</label>
+                    <select id="secondMultiSelect" multiple size="10">
+                    </select>
+                </div>
+                <button id="generateDraftBtn">Add to Generate XML page</button>
+            </div>
+            <!-- Close button -->
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2></h2>
+            <!-- Add your controls/operations here -->
+        </div>
+        <div class="modal-overlay" id="modalOverlay">
+            <!-- Modal dialog -->
+            <div class="modal-dialog">
+                <!-- Error message -->
+                <p class="error-message" id="errorMessage">Tags with spaces are not allowed. Use hyphen (-) instead.</p>
+                <!-- Close button -->
+                <button class="close-btn-errorMsg" onclick="closeModalOverlay()">Close</button>
+            </div>
+        </div>
+    </div>
 <script>
 
     // Declare xmlDoc as a global variable
@@ -1614,6 +1661,20 @@
         }
     }
 
+    function addNewTestCase() {
+        console.log("add new test case function");
+        document.getElementById('overlay').style.display = 'block';
+        document.getElementById('modal-NewTestCase').style.display = 'block';
+        launchModal();
+
+        // if (selectedRowCount > 0) {
+        //     // Show the overlay and modal
+
+        // } else {
+
+        // }
+    }
+
     function launchModal() {
         // ... (your existing modal launching code)
 
@@ -1664,11 +1725,13 @@
     var appendUpdateTags = document.getElementById('appendUpdateTags');
     var deleteSelectedTestCasesOption = document.getElementById('deleteSelectedTestCasesOption');
     var browseTestCases = document.getElementById('browseTestCases');
+    var addNewTestCases = document.getElementById('addNewTestCaseToXML');
 
     // Add event listeners to call the corresponding functions when options are clicked
     appendUpdateTags.addEventListener('click', appendNewTag);
     deleteSelectedTestCasesOption.addEventListener('click', deleteSelectedTestCases);
     browseTestCases.addEventListener('click', browseTestCases);
+    addNewTestCases.addEventListener('click', addNewTestCase);
 
 
     var proceedToDelTestCasesInXML = document.getElementById('deleteTestCaseBtn');
