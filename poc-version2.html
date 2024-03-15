@@ -242,6 +242,14 @@
             width: 50px; /* Adjust the width as needed */
         }
 
+        th:nth-child(2), td:nth-child(2) {
+            width: 200px; /* Adjust the width as needed */
+        }
+
+        th:nth-child(3), td:nth-child(3) {
+            width: 450px; /* Adjust the width as needed */
+        }
+
 
         tbody tr:hover {
             background-color: #f9f9f9;
@@ -606,6 +614,49 @@
             background-color: green; /* Green color for the close button */
             outline: none; /* Remove default focus outline */
         }
+
+        .overwrite-label {
+            display: inline-block;
+            width: 25px; /* Adjust width as needed */
+            height: 25px; /* Adjust height as needed */
+            background-color: rgb(13, 102, 228); /* Set background color */
+            color: #fff; /* Set text color */
+            text-align: center;
+            line-height: 25px; /* Match height for vertical centering */
+            border-radius: 5px; /* Optional: Add rounded corners */
+            cursor: pointer; /* Show pointer on hover */
+            font-weight: bold;
+            /* Add box shadow for 3D effect */
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Adjust values as needed */
+        }
+
+        .overwrite-label-append {
+            display: inline-block;
+            width: 25px; /* Adjust width as needed */
+            height: 25px; /* Adjust height as needed */
+            background-color: rgb(154, 45, 91); /* Set background color */
+            color: #fff; /* Set text color */
+            text-align: center;
+            line-height: 25px; /* Match height for vertical centering */
+            border-radius: 5px; /* Optional: Add rounded corners */
+            cursor: pointer; /* Show pointer on hover */
+            font-weight: bold;
+            /* Add box shadow for 3D effect */
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Adjust values as needed */
+        }
+
+
+        .overwrite-label span {
+            text-align: center;
+            position: absolute; /* Set position absolute */
+            top: 50%; /* Adjust vertical position */
+            left: 50%; /* Adjust horizontal position */
+            transform: translate(-50%, -50%); /* Center the text */
+        }
+
+        #tableBodyXML td {
+            height: 20px; /* Adjust height as needed */
+        }
     </style>
 </head>
 <body>
@@ -714,7 +765,7 @@
                 <table>
                     <thead class="grid-header">
                         <tr class="grid-header">
-                            <th>Select</th>
+                            <th>State</th>
                             <th>Test Case ID</th>
                             <th>Robot Test Name</th>
                             <th>Robot Suite Name</th>
@@ -917,7 +968,7 @@
                         // Create new row for tableBodyXML
                         var newRow = document.createElement('tr');
                         newRow.innerHTML = `
-                            <td>${row.cells[0].innerHTML}</td>
+                            <td><label class="overwrite-label">↑↓</label></td>
                             <td>${row.cells[1].innerHTML}</td>
                             <td>${row.cells[2].innerHTML}</td>
                             <td>${row.cells[3].innerHTML}</td>
@@ -1005,7 +1056,7 @@
             // Create new row for tableBodyXML
             var newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <td>${row.cells[0].innerHTML}</td>
+                <td><label class="overwrite-label-append">>>|</label></td>
                 <td>${row.cells[1].innerHTML}</td>
                 <td>${row.cells[2].innerHTML}</td>
                 <td>${row.cells[3].innerHTML}</td>
@@ -1281,6 +1332,7 @@
             } else {
                 // Data present
                 console.log("Data found in tableBodyXML");
+                setTooltips();
             }
             
         }
