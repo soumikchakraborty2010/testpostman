@@ -670,7 +670,22 @@
             display: inline-block;
             width: 25px; /* Adjust width as needed */
             height: 25px; /* Adjust height as needed */
-            background-color: rgb(154, 45, 91); /* Set background color */
+            background-color: rgb(159, 117, 33); /* Set background color */
+            color: #fff; /* Set text color */
+            text-align: center;
+            line-height: 25px; /* Match height for vertical centering */
+            border-radius: 5px; /* Optional: Add rounded corners */
+            cursor: pointer; /* Show pointer on hover */
+            font-weight: bold;
+            /* Add box shadow for 3D effect */
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Adjust values as needed */
+        }
+
+        .overwrite-label-delete {
+            display: inline-block;
+            width: 25px; /* Adjust width as needed */
+            height: 25px; /* Adjust height as needed */
+            background-color: rgb(188, 8, 8); /* Set background color */
             color: #fff; /* Set text color */
             text-align: center;
             line-height: 25px; /* Match height for vertical centering */
@@ -721,6 +736,7 @@
                 <div class="menu-content">
                     <div id="appendUpdateTags" class="menu-option">Overwrite or Append tags</div>
                     <div id="deleteSelectedTestCasesOption" class="menu-option">Delete selected Test cases</div>
+                    <div id="addNewTestCaseToXML" class="menu-option">Add new Test case</div>
                     <div id="browseTestCases" class="menu-option">Browse XML</div>
                 </div>                
             </div>
@@ -799,11 +815,11 @@
                 <table>
                     <thead class="grid-header">
                         <tr class="grid-header">
-                            <th>State</th>
+                            <th></th>
                             <th>Test Case ID</th>
                             <th>Robot Test Name</th>
                             <th>Robot Suite Name</th>
-                            <th>New Tags</th>
+                            <th>Tags</th>
                         </tr>
                     </thead>
                     <tbody id="tableBodyXML"></tbody>
@@ -1034,6 +1050,7 @@
                             var tableBodyXML = document.getElementById('tableBodyXML');
                             tableBodyXML.appendChild(newRow);
                         }
+                        closeModal();
                     });
 
                     // Do something for replaceTags option
@@ -1112,6 +1129,48 @@
                 var tableBodyXML = document.getElementById('tableBodyXML');
                 tableBodyXML.appendChild(newRow);
             }
+        });
+    }
+
+    function deleteSelectedTestCasesFromXML() {
+
+        var tableBody = document.getElementById('tableBody');
+        var selectedRows = tableBody.querySelectorAll('tr.selected');
+        
+        // Iterate over selected rows
+        selectedRows.forEach(function(row) {
+            var testCaseId = row.cells[1].textContent.trim(); // Assuming the second column is the Test Case ID
+            // Check if a row with the same Test Case ID already exists in tableBodyXML
+
+            let existingRow;
+            let tdElements = document.querySelectorAll('#tableBodyXML tr td');
+
+            for (let td of tdElements) {
+                if (td.textContent.trim() === testCaseId) {
+                    existingRow = td.parentNode;
+                    break; // Exit the loop once the condition is met
+                }
+            }
+
+            // Create new row for tableBodyXML
+            var newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td><label class="overwrite-label-delete">--</label></td>
+                <td>${row.cells[1].innerHTML}</td>
+                <td>${row.cells[2].innerHTML}</td>
+                <td>${row.cells[3].innerHTML}</td>
+                <td>${row.cells[4].innerHTML}</td>
+            `;
+
+            // If an existing row with the same Test Case ID exists, replace it; otherwise, append the new row
+            if (existingRow) {
+                existingRow.replaceWith(newRow);
+            } else {
+                var tableBodyXML = document.getElementById('tableBodyXML');
+                tableBodyXML.appendChild(newRow);
+            }
+
+            closeMainModalDeleteTC();
         });
     }
 
@@ -1610,6 +1669,11 @@
     appendUpdateTags.addEventListener('click', appendNewTag);
     deleteSelectedTestCasesOption.addEventListener('click', deleteSelectedTestCases);
     browseTestCases.addEventListener('click', browseTestCases);
+
+
+    var proceedToDelTestCasesInXML = document.getElementById('deleteTestCaseBtn');
+    proceedToDelTestCasesInXML.addEventListener('click', deleteSelectedTestCasesFromXML);
+
 
 
     // Function to display the modal
