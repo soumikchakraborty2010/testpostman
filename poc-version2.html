@@ -530,6 +530,11 @@
             background-color: #45a049;
         }
 
+        .modal-body {
+            display: flex; /* Use flexbox layout */
+            justify-content: center; /* Center-align items horizontally */
+        }
+
         #deleteTestCaseBtn {
             display: inline-block;
             background-color: #c12038; /* Red background for delete button */
@@ -771,7 +776,7 @@
                     <select id="secondMultiSelect" multiple size="10">
                     </select>
                 </div>
-                <button id="generateDraftBtn">Copy to Generate XML table</button>
+                <button id="generateDraftBtn">Add to Generate XML page</button>
             </div>
             <!-- Close button -->
             <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -811,12 +816,7 @@
         <div class="modal-msg-content">
             <!-- Close button -->
             <span class="modal-msg-close-btn" onclick="closeMainModal()">&times;</span>
-            <!-- Modal title -->
-            <!-- <div class="modal-title">No Data Found</div> -->
-            <!-- Modal content -->
             <div class="modal-body">
-                <!-- Your modal content here -->
-                <!-- For example, error message -->
                 <p id="mainModalMessage"></p>
             </div>
         </div>
@@ -824,18 +824,13 @@
     <div class="modal-msg" id="mainModalDeleteTC">
         <div class="modal-msg-content">
             <!-- Close button -->
-            <span class="modal-msg-close-btn" onclick="closeMainModal()">&times;</span>
-            <!-- Modal title -->
-            <!-- <div class="modal-title">No Data Found</div> -->
-            <!-- Modal content -->
+            <span class="modal-msg-close-btn" onclick="closeMainModalDeleteTC()">&times;</span>
             <div class="modal-body">
-                <!-- Your modal content here -->
-                <!-- For example, error message -->
                 <p id="mainModalMessageDelete"></p>
             </div>
             <div class="modal-body">
                 <button id="deleteTestCaseBtn">Proceed</button>
-                <button id="cancelDeleteTestCaseBtn">Cancel</button>
+                <button id="cancelDeleteTestCaseBtn" onclick="closeMainModalDeleteTC()">Cancel</button>
             </div>
         </div>
     </div>
@@ -1596,6 +1591,12 @@
 
     function closeMainModal() {
         var mainModal = document.getElementById('mainModal');
+        mainModal.style.display = 'none';
+        document.body.classList.remove('modal-open'); // Remove class to enable scrolling on background
+    }
+
+    function closeMainModalDeleteTC() {
+        var mainModal = document.getElementById('mainModalDeleteTC');
         mainModal.style.display = 'none';
         document.body.classList.remove('modal-open'); // Remove class to enable scrolling on background
     }
