@@ -708,6 +708,145 @@
         #tableBodyXML td {
             height: 20px; /* Adjust height as needed */
         }
+
+
+
+
+        /* Modal container */
+        .modalNewTC {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        /* Modal content */
+        .modal-content-new-tc {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            max-width: 80%;
+        }
+
+        /* Modal title */
+        .modal-title-new-tc {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Top control */
+        .top-control-new-tc {
+            margin-bottom: 20px;
+        }
+
+        .top-control-new-tc input {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Middle control */
+        .middle-control-new-tc {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        /* Left control */
+        .left-control-new-tc,
+        .right-control-new-tc {
+            width: 48%;
+        }
+
+        .left-control-new-tc select,
+        .right-control-new-tc input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Generate Draft button */
+        #generateDraftBtn-new-tc {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #generateDraftBtn-new-tc:hover {
+            background-color: #0056b3;
+        }
+
+        /* Close button */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Modal overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+        }
+
+        /* Modal dialog */
+        .modal-dialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Error message */
+        .error-message {
+            margin-bottom: 10px;
+        }
+
+        /* Close button for error message */
+        .close-btn-errorMsg {
+            padding: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .close-btn-errorMsg:hover {
+            background-color: #bd2130;
+        }
     </style>
 </head>
 <body>
@@ -850,38 +989,41 @@
             </div>
         </div>
     </div>
-    <div class="modal" id="modal-NewTestCase">
-        <div class="modal-title">Add New Test case</div>
-        <div class="modal-content">
-            <div class="top-control">
-                <div class="text-box-container">
-                    <input type="text" id="newTestCaseIDTextbox" placeholder="Enter Test Case ID" enabled />
-                    <input type="text" id="newRobotTestNameTextbox" placeholder="Enter Robot Test Name" enabled />
-                    <input type="text" id="newRobotTestSuiteTextbox" placeholder="Enter Robot Test Suite" enabled />
-                </div>
+    <div class="modalNewTC" id="modal-NewTestCase">
+        <div class="modal-title-new-tc">Add New Test case</div>
+        <div class="modal-content-new-tc">
+            <!-- Top control items -->
+            <div class="top-control-new-tc">
+                <input type="text" id="newTestCaseIDTextbox" placeholder="Enter Test Case ID" enabled />
+                <input type="text" id="newRobotTestNameTextbox" placeholder="Enter Robot Test Name" enabled />
+                <input type="text" id="newRobotTestSuiteTextbox" placeholder="Enter Robot Test Suite" enabled />
             </div>
-            <div class="left-control">
-                <label for="multiSelect">Select from Existing Tags:</label>
-                <select id="multiSelect" multiple size="10">
-                </select>
-            </div>
-            <div class="right-control">
-                <div class="checkbox-container">
-                    <input type="checkbox" id="addNewTagCheckbox" />
-                    <label for="addNewTagCheckbox">Add New Tag</label>
-                </div>
-    
-                <div class="text-box-container">
-                    <input type="text" id="newTagTextbox" placeholder="Enter new tag" disabled />
-                </div>
-    
-                <div class="second-multi-select-container">
-                    <label for="secondMultiSelect">Select New Tags:</label>
-                    <select id="secondMultiSelect" multiple size="10">
+            <!-- Middle control items -->
+            <div class="middle-control-new-tc">
+                <div class="left-control-new-tc">
+                    <label for="multiSelect">Select from Existing Tags:</label>
+                    <select id="multiSelect" multiple size="10">
                     </select>
                 </div>
-                <button id="generateDraftBtn">Add to Generate XML page</button>
+                <div class="right-control-new-tc">
+                    <div class="checkbox-container-new-tc">
+                        <input type="checkbox" id="addNewTagCheckbox-new-tc" />
+                        <label for="addNewTagCheckbox-new-tc">Add New Tag</label>
+                    </div>
+    
+                    <div class="text-box-container-new-tc">
+                        <input type="text" id="newTagTextbox-new-tc" placeholder="Enter new tag" disabled />
+                    </div>
+    
+                    <div class="second-multi-select-container-new-tc">
+                        <label for="secondMultiSelect-new-tc">Select New Tags:</label>
+                        <select id="secondMultiSelect-new-tc" multiple size="10">
+                        </select>
+                    </div>
+                </div>
             </div>
+            <!-- Generate Draft button -->
+            <button id="generateDraftBtn-new-tc">Add to Generate XML page</button>
             <!-- Close button -->
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <h2></h2>
@@ -897,6 +1039,7 @@
             </div>
         </div>
     </div>
+    
 <script>
 
     // Declare xmlDoc as a global variable
