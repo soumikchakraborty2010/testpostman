@@ -734,15 +734,42 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            max-width: 80%;
+            width: 70%; /* Adjust width as needed */
+            height: 60%; /* Adjust height as needed */
+            overflow: auto;
         }
 
-        /* Modal title */
-        .modal-title-new-tc {
-            font-size: 24px;
+        /* .modal-title-new-tc {
+            font-size: 14px;
             font-weight: bold;
+            background-color: #555;
+            color: #fff;
+            padding: 10px; 
+            margin: 0;
+            text-align: left;
+            width: calc(100% - 2px); 
+            line-height: 1; 
             margin-bottom: 10px;
+        } */
+
+        .modal-title-new-tc {
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #555;
+            color: #fff;
+            padding: 5px 10px; 
+            margin: 0;
+            text-align: left;
+            width: calc(100% - 2px); 
+            line-height: 1; 
+            margin-bottom: 10px;
+            position: absolute;
+            top: 2px; 
+            left: 2px; 
         }
+
+
+
 
         /* Top control */
         .top-control-new-tc {
@@ -797,13 +824,13 @@
         }
 
         /* Close button */
-        .close-btn {
+        /* .close-btn {
             position: absolute;
             top: 10px;
             right: 10px;
             font-size: 24px;
             cursor: pointer;
-        }
+        } */
 
         /* Modal overlay */
         .modal-overlay {
@@ -835,18 +862,18 @@
         }
 
         /* Close button for error message */
-        .close-btn-errorMsg {
+        /* .close-btn-errorMsg {
             padding: 10px;
             background-color: #dc3545;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-        }
+        } */
 
-        .close-btn-errorMsg:hover {
+        /* .close-btn-errorMsg:hover {
             background-color: #bd2130;
-        }
+        } */
     </style>
 </head>
 <body>
@@ -989,9 +1016,9 @@
             </div>
         </div>
     </div>
-    <div class="modalNewTC" id="modal-NewTestCase">
-        <div class="modal-title-new-tc">Add New Test case</div>
+    <div class="modalNewTC" id="modal-NewTestCase">    
         <div class="modal-content-new-tc">
+            <div class="modal-title-new-tc">Add New Test case</div>
             <!-- Top control items -->
             <div class="top-control-new-tc">
                 <input type="text" id="newTestCaseIDTextbox" placeholder="Enter Test Case ID" enabled />
