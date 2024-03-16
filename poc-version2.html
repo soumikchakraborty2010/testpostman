@@ -719,9 +719,11 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100%; 
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 9999;
+            /* max-width: 800px; */
+            /* min-width: 320px;  */
         }
 
         /* Modal content */
@@ -732,44 +734,35 @@
             transform: translate(-50%, -50%);
             background-color: white;
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             width: 70%; /* Adjust width as needed */
             height: 60%; /* Adjust height as needed */
             overflow: auto;
+            max-width: 600px;
+            /* max-height: calc(800px / 2);  */
         }
 
-        /* .modal-title-new-tc {
-            font-size: 14px;
-            font-weight: bold;
-            background-color: #555;
-            color: #fff;
-            padding: 10px; 
-            margin: 0;
-            text-align: left;
-            width: calc(100% - 2px); 
-            line-height: 1; 
-            margin-bottom: 10px;
-        } */
 
+        /* Modal title */
         .modal-title-new-tc {
             font-size: 14px;
             font-weight: bold;
             background-color: #555;
             color: #fff;
-            padding: 5px 10px; 
+            padding: 10px; /* Adjust padding as needed */
             margin: 0;
             text-align: left;
-            width: calc(100% - 2px); 
+            width: calc(100% - 22px); /* Adjust width to accommodate padding and space for close button */
             line-height: 1; 
-            margin-bottom: 10px;
-            position: absolute;
-            top: 2px; 
-            left: 2px; 
+            margin-bottom: 20px; /* Add space between title and top-control-new-tc */
+            height: 20px; /* Adjust height as needed */
+            display: flex;
+            align-items: center;
+            position: absolute; /* Position absolute for precise placement */
+            top: 1px; /* Adjust top position as needed */
+            left: 1px; /* Adjust left position to be at the extreme left */
         }
-
-
-
 
         /* Top control */
         .top-control-new-tc {
@@ -824,13 +817,37 @@
         }
 
         /* Close button */
-        /* .close-btn {
+        /* .close-btn-new-tc {
             position: absolute;
             top: 10px;
             right: 10px;
             font-size: 24px;
             cursor: pointer;
         } */
+
+
+
+        /* Close button */
+        .close-btn-new-tc {
+            width: 30px; /* Adjust width as needed */
+            height: 30px; /* Adjust height to match modal-title-new-tc */
+            line-height: 30px; /* Adjust line height to center text vertically */
+            text-align: center; /* Center the text horizontally */
+            background-color: #007bff; /* Button background color */
+            color: #fff; /* Button text color */
+            border: none; /* Remove button border */
+            border-radius: 0; /* Remove border radius */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            position: absolute; /* Position absolute for precise placement */
+            top: 1px; /* Adjust top position to match modal-title-new-tc */
+            right: 1px; /* Adjust right position to match modal-title-new-tc */
+            font-size: 14px; /* Adjust font size as needed */
+            display: flex; /* Use flexbox for alignment */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+
+
 
         /* Modal overlay */
         .modal-overlay {
@@ -862,18 +879,18 @@
         }
 
         /* Close button for error message */
-        /* .close-btn-errorMsg {
+        .close-btn-errorMsg {
             padding: 10px;
             background-color: #dc3545;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-        } */
+        }
 
-        /* .close-btn-errorMsg:hover {
+        .close-btn-errorMsg:hover {
             background-color: #bd2130;
-        } */
+        }
     </style>
 </head>
 <body>
@@ -1052,7 +1069,7 @@
             <!-- Generate Draft button -->
             <button id="generateDraftBtn-new-tc">Add to Generate XML page</button>
             <!-- Close button -->
-            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <span class="close-btn-new-tc" onclick="closeModal()">&times;</span>
             <h2></h2>
             <!-- Add your controls/operations here -->
         </div>
