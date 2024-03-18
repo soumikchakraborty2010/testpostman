@@ -1225,7 +1225,6 @@
         document.getElementById(tabName).style.display = 'block';
     }
 
-
     // Function to fetch and parse the XML file
     function fetchAndParseXML() {
         fetch('poc.xml')
@@ -1364,9 +1363,8 @@
                 }
             }
         });
-
-
-            // Find the button element
+            
+        // Find the button element
         var generateDraftBtnNewTC = document.getElementById("generateDraftBtn-new-tc");
 
         // Add event listener to the button
@@ -1508,8 +1506,6 @@
             }
         });
 
-
-
         var multiSelect = document.getElementById('multiSelect');
         var secondMultiSelect = document.getElementById('secondMultiSelect');
         // Add event listener for multiSelect
@@ -1633,7 +1629,6 @@
 
     });   
 
-
     function appendTagsToSelectedRows(selectedRows, selectedMultiOptions, selectedSecondMultiOptions) {
         // Iterate over selected rows
         selectedRows.forEach(function(row) {
@@ -1738,7 +1733,6 @@
 
         });
     }
-
 
     // Function to generate unique tags list
     function generateUniqueTagsList(xmlDoc) {
@@ -1851,6 +1845,7 @@
         fetchAndParseXML(); // Fetch and parse XML
         generateUniqueTagsList(xmlDoc); // Generate and log unique tags list
         getUniqueSuiteNames(xmlDoc);
+        handleTabClick('tree-tab');
     };
 
     // Function to generate tree view
@@ -2004,7 +1999,6 @@
         }
     }
 
-
     function fillGrid(xmlDoc) {
         // Get the #tableBody element
         var tableBody = document.getElementById('tableBody');
@@ -2073,7 +2067,6 @@
         });
     }
 
-
     // Function to filter rows based on the selected tag
     function filterByTag(tag) {
         // Get all rows in the table body
@@ -2094,7 +2087,6 @@
         document.getElementById('suiteFilter').value = 'All Suites';
         updateSelectedItemCount();
     }
-
 
     // Function to filter rows based on the selected suite
     function filterBySuite(suite) {
@@ -2126,24 +2118,6 @@
         var countInfo = document.getElementById('selectedItemCount');
         countInfo.textContent = `${selectedRowCount} of items are currently selected`;
     }
-
-
-    // function appendNewTag() {
-    //     // Get the count of selected rows
-    //     selectedRowCount = document.querySelectorAll('.grid-container tbody tr.selected').length;
-
-    //     // Check if there are selected rows
-    //     if (selectedRowCount > 0) {
-    //         // Your logic for appending a new tag to selected test cases
-    //         // ...
-
-    //         // Optionally, you can display a message to the user
-    //         // console.log('Appending new tag to selected test cases.');
-    //     } else {
-    //         // Display a message or take any other action when no rows are selected
-    //         // console.log('Please select at least one row before appending a new tag.');
-    //     }
-    // }
 
     function appendNewTag() {
         // Get the count of selected rows
@@ -2228,9 +2202,6 @@
 
         // ... (other modal setup code)
     }
-
-
-
 
     // Function to close the modal
     function closeModal() {
@@ -2396,7 +2367,6 @@
         toast.className = "toast-message show";
         setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 5000);
     }
-
 
 </script>
 
