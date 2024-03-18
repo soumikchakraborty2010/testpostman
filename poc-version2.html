@@ -666,6 +666,21 @@
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Adjust values as needed */
         }
 
+        .overwrite-label-addNewTC {
+            display: inline-block;
+            width: 25px; /* Adjust width as needed */
+            height: 25px; /* Adjust height as needed */
+            background-color: rgb(59, 163, 30); /* Set background color */
+            color: #fff; /* Set text color */
+            text-align: center;
+            line-height: 25px; /* Match height for vertical centering */
+            border-radius: 5px; /* Optional: Add rounded corners */
+            cursor: pointer; /* Show pointer on hover */
+            font-weight: bold;
+            /* Add box shadow for 3D effect */
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Adjust values as needed */
+        }
+
         .overwrite-label-append {
             display: inline-block;
             width: 25px; /* Adjust width as needed */
@@ -1309,7 +1324,7 @@
                         showModalNewTestCase("Already an existing Tags list ! Please choose a unique name.");
                     }else {
                         if(this.value.trim() !== ""){
-                            addToSecondMultiSelectNewTC(this.value,newTagTextbox);
+                            addToSecondMultiSelectNewTC(this.value,newTagTextboxnewTC);
                         }
                     }
                     // Reset border color if no spaces
@@ -1385,7 +1400,7 @@
                                             // Create new row for tableBodyXML
                                             var newRow = document.createElement('tr');
                                             newRow.innerHTML = `
-                                                <td><label class="overwrite-label">+</label></td>
+                                                <td><label class="overwrite-label-addNewTC">+</label></td>
                                                 <td>${testCaseID}</td>
                                                 <td>${robotTestName}</td>
                                                 <td>${robotTestSuite}</td>
@@ -1394,15 +1409,18 @@
 
                                             let existingRow;
                                             let tdElements = document.querySelectorAll('#tableBodyXML tr td');
-
+                                            console.log(tdElements);
                                             for (let td of tdElements) {
                                                 if (td.textContent.trim() === testCaseID) {
+                                                    existingRow = td.parentNode;
+                                                    break; // Exit the loop once the condition is met
+                                                }else if(td.textContent.trim() === robotTestName){
                                                     existingRow = td.parentNode;
                                                     break; // Exit the loop once the condition is met
                                                 }
                                             }
 
-                                            // If an existing row with the same Test Case ID exists, replace it; otherwise, append the new row
+                                            // If an existing row with the same Test Case ID or name exists, replace it; otherwise, append the new row
                                             if (existingRow) {
                                                 existingRow.replaceWith(newRow);
                                             } else {
@@ -1410,14 +1428,15 @@
                                                 tableBodyXML.appendChild(newRow);
                                             }
 
-                                            // closeModalNewTestCaseDialog();
+                                            document.getElementById("newTestCaseIDTextbox").value = "";
+                                            document.getElementById("newRobotTestNameTextbox").value = "";
                                         }
                                     });
                                 }else {
 
                                     var newRow = document.createElement('tr');
                                     newRow.innerHTML = `
-                                        <td><label class="overwrite-label">+</label></td>
+                                        <td><label class="overwrite-label-addNewTC">+</label></td>
                                         <td>${testCaseID}</td>
                                         <td>${robotTestName}</td>
                                         <td>${robotTestSuite}</td>
@@ -1431,6 +1450,9 @@
                                         if (td.textContent.trim() === testCaseID) {
                                             existingRow = td.parentNode;
                                             break; // Exit the loop once the condition is met
+                                        }else if(td.textContent.trim() === robotTestName){
+                                            existingRow = td.parentNode;
+                                            break; // Exit the loop once the condition is met
                                         }
                                     }
 
@@ -1441,6 +1463,9 @@
                                         var tableBodyXML = document.getElementById('tableBodyXML');
                                         tableBodyXML.appendChild(newRow);
                                     }
+
+                                    document.getElementById("newTestCaseIDTextbox").value = "";
+                                    document.getElementById("newRobotTestNameTextbox").value = "";
 
                                     // closeModalNewTestCaseDialog();
                                 }
