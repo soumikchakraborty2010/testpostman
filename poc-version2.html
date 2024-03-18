@@ -1349,32 +1349,72 @@
                     var tableBody = document.getElementById('tableBody');
                     var selectedRows = tableBody.querySelectorAll('tr');
 
+                    var conditionMet = false;
+
                         // Iterate over selected rows and update Tags column
                         selectedRows.forEach(function(row) {
-                            var testCaseIdXML = row.cells[1].textContent; // Assuming the second column is the Test Case ID
-                            var testCaseNameXML = row.cells[2].textContent; // Assuming the second column is the Test Case ID
-                            var newTags = '';
+                            if (!conditionMet) {
+                                var testCaseIdXML = row.cells[1].textContent; // Assuming the second column is the Test Case ID
+                                var testCaseNameXML = row.cells[2].textContent; // Assuming the second column is the Test Case ID
+                                var newTags = '';
 
-                            // Create comma-separated list of selected tags from multiSelect
-                            for (var i = 0; i < selectedMultiOptions.length; i++) {
-                                newTags += selectedMultiOptions[i].textContent + ', ';
-                            }
+                                // Create comma-separated list of selected tags from multiSelect
+                                for (var i = 0; i < selectedMultiOptions.length; i++) {
+                                    newTags += selectedMultiOptions[i].textContent + ', ';
+                                }
 
-                            // Create comma-separated list of selected tags from secondMultiSelect
-                            for (var j = 0; j < selectedSecondMultiOptions.length; j++) {
-                                newTags += selectedSecondMultiOptions[j].textContent + ', ';
-                            }
+                                // Create comma-separated list of selected tags from secondMultiSelect
+                                for (var j = 0; j < selectedSecondMultiOptions.length; j++) {
+                                    newTags += selectedSecondMultiOptions[j].textContent + ', ';
+                                }
 
-                            // Trim trailing comma and space
-                            newTags = newTags.replace(/,\s*$/, '');
-                            
-                            console.log("Before same TC check");
+                                // Trim trailing comma and space
+                                newTags = newTags.replace(/,\s*$/, '');
+                                
+                                console.log("Before same TC check");
 
-                            if(testCaseIdXML.trim() === testCaseID.trim() || testCaseNameXML.trim() === robotTestName.trim()){
-                                console.log("Same TC found");
-                                showModalForNewTCOverwrite("Same Test Case is found in your XML file ! Do you want to overwrite ?");
-                            }else {
-                                    // Create new row for tableBodyXML
+                                if(testCaseIdXML.trim() === testCaseID.trim() || testCaseNameXML.trim() === robotTestName.trim()){
+                                    console.log("Same TC found");
+                                    // conditionMet = true;
+                                    // showModalForNewTCOverwrite("Same Test Case is found in your XML file ! Do you want to overwrite ?");
+                                    showModalForNewTCOverwrite("Same Test Case is found in your XML file ! Do you want to overwrite ?", function(result) {
+                                        console.log(result);
+                                        if (result === "cancel") {
+                                            conditionMet = true; // Set the flag to true
+                                        }else {
+                                            // Create new row for tableBodyXML
+                                            var newRow = document.createElement('tr');
+                                            newRow.innerHTML = `
+                                                <td><label class="overwrite-label">+</label></td>
+                                                <td>${testCaseID}</td>
+                                                <td>${robotTestName}</td>
+                                                <td>${robotTestSuite}</td>
+                                                <td>${newTags}</td>
+                                            `;
+
+                                            let existingRow;
+                                            let tdElements = document.querySelectorAll('#tableBodyXML tr td');
+
+                                            for (let td of tdElements) {
+                                                if (td.textContent.trim() === testCaseID) {
+                                                    existingRow = td.parentNode;
+                                                    break; // Exit the loop once the condition is met
+                                                }
+                                            }
+
+                                            // If an existing row with the same Test Case ID exists, replace it; otherwise, append the new row
+                                            if (existingRow) {
+                                                existingRow.replaceWith(newRow);
+                                            } else {
+                                                var tableBodyXML = document.getElementById('tableBodyXML');
+                                                tableBodyXML.appendChild(newRow);
+                                            }
+
+                                            // closeModalNewTestCaseDialog();
+                                        }
+                                    });
+                                }else {
+
                                     var newRow = document.createElement('tr');
                                     newRow.innerHTML = `
                                         <td><label class="overwrite-label">+</label></td>
@@ -1401,9 +1441,12 @@
                                         var tableBodyXML = document.getElementById('tableBodyXML');
                                         tableBodyXML.appendChild(newRow);
                                     }
-                            closeModal();
-                        }
-                    });
+
+                                    // closeModalNewTestCaseDialog();
+                                }
+
+                            }
+                        });
                 }
             }
         });
@@ -2208,11 +2251,25 @@
         mainModal.style.display = 'flex';
     }
 
-    function showModalForNewTCOverwrite(message) {
+    function showModalForNewTCOverwrite(message, callback) {
         var mainModal = document.getElementById('newTCModalConfirmation');
         var mainModalMessage = document.getElementById('mainModalNewTCConfirmation');
         mainModalMessage.textContent = message;
         mainModal.style.display = 'flex';
+
+
+        var confirmButton = document.getElementById('ProceedAndOverwrite');
+        confirmButton.onclick = function() {
+            mainModal.style.display = 'none'; // Hide the modal
+            callback('confirm'); // Invoke the callback with the 'confirm' result
+        };
+
+        // Assuming you have a button with id="cancelOverwrite" for canceling overwrite
+        var cancelButton = document.getElementById('cancelMainModalNewTCConfirmation');
+        cancelButton.onclick = function() {
+            mainModal.style.display = 'none'; // Hide the modal
+            callback('cancel'); // Invoke the callback with the 'cancel' result
+        };
     }
 
     // Function to display a modal on the main HTML page
