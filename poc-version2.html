@@ -996,6 +996,27 @@
             to {bottom: 0; opacity: 0;}
         }
 
+        #generateAndSaveNewXMLfromPage {
+            display: block;
+            margin: 0 auto;
+            width: fit-content; /* Adjusts width based on content */
+            padding: 10px 20px;
+            background-color: #4CAF50; /* Green background */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            /* transition: background-color 0.3s; */
+        }
+
+        #generateAndSaveNewXMLfromPage:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+
     </style>
 </head>
 <body>
@@ -1114,6 +1135,9 @@
                 </table>
             </div>
             <!-- Grid content will be dynamically generated using JavaScript -->
+        </div>
+        <div>
+            <button id="generateAndSaveNewXMLfromPage" onclick="generateAndSaveNewXMLfromPage()">Generate new XML file and save locally</button>
         </div>
     </div>
     <div class="modal-msg" id="mainModal">
@@ -1457,7 +1481,7 @@
                                                 var tableBodyXML = document.getElementById('tableBodyXML');
                                                 tableBodyXML.appendChild(newRow);
                                             }
-
+                                            showToast("Added to Generate XML tab !");
                                             document.getElementById("newTestCaseIDTextbox").value = "";
                                             document.getElementById("newRobotTestNameTextbox").value = "";
                                         }
@@ -1493,7 +1517,7 @@
                                         var tableBodyXML = document.getElementById('tableBodyXML');
                                         tableBodyXML.appendChild(newRow);
                                     }
-
+                                    showToast("Added to Generate XML tab !");
                                     document.getElementById("newTestCaseIDTextbox").value = "";
                                     document.getElementById("newRobotTestNameTextbox").value = "";
 
@@ -2367,6 +2391,106 @@
         toast.className = "toast-message show";
         setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 5000);
     }
+
+
+    function generateAndSaveNewXMLfromPage() {
+        // Read the content of tableBodyXML
+        var tableBody = document.getElementById('tableBodyXML');
+        var tableRows = tableBody.querySelectorAll('tr');
+
+        if (xmlDoc) {
+            // Create a new XML document to avoid modifying the original one
+            var xmlDocNew = xmlDoc.cloneNode(true);
+
+            // Iterate over each table row
+            tableRows.forEach(function(row) {
+                var label = row.cells[0].textContent.trim(); // Get the label text
+                var testCaseId = row.cells[1].textContent.trim(); // Get the Test Case ID
+                var testCaseName = row.cells[2].textContent.trim(); // Get the Test Case Name
+                var testCaseSuite = row.cells[3].textContent.trim(); // Get the Test Case Suite
+                var testCaseTags = row.cells[4].textContent.trim(); // Get the Test Case Tags
+
+                if (label === "--") {
+                    // Delete the corresponding testCase element from the XML
+                    var testCaseToDelete = xmlDocNew.querySelector('testCase[id="' + testCaseId + '"]');
+                    if (testCaseToDelete) {
+                        testCaseToDelete.parentNode.removeChild(testCaseToDelete);
+                    }
+                } else {
+                    // Check if the Test Case ID exists in poc.xml
+                    var existingTestCase = xmlDocNew.querySelector('testCase[id="' + testCaseId + '"]');
+                    if (existingTestCase) {
+                        // Update existing testCase element with new values
+                        existingTestCase.setAttribute('name', testCaseName);
+                        existingTestCase.setAttribute('suite', testCaseSuite);
+                        existingTestCase.setAttribute('tags', testCaseTags);
+                    } else {
+                        // Add new testCase element to the XML
+                        var newTestCase = xmlDocNew.createElement('testCase');
+                        newTestCase.setAttribute('id', testCaseId);
+                        newTestCase.setAttribute('name', testCaseName);
+                        newTestCase.setAttribute('suite', testCaseSuite);
+                        newTestCase.setAttribute('tags', testCaseTags);
+                        var tagsMapping = xmlDocNew.getElementsByTagName('tagsMapping')[0];
+                        if (tagsMapping) {
+                            tagsMapping.appendChild(document.createTextNode('\n    '));
+                            tagsMapping.appendChild(newTestCase);
+                        } else {
+                            console.error('tagsMapping element not found in xmlDocNew.');
+                        }
+                    }
+                }
+            });
+
+            // Remove any blank entries
+            var blankEntries = xmlDocNew.querySelectorAll('testCase:not([id])');
+            blankEntries.forEach(function(blankEntry) {
+                blankEntry.parentNode.removeChild(blankEntry);
+            });
+
+            // Serialize XML to string with proper formatting
+            var xmlString = new XMLSerializer().serializeToString(xmlDocNew);
+            // xmlString = xmlString.replace(/<testCase/g, '    <testCase');
+            xmlString = xmlString.replace(/ {8}<testCase/g, '    <testCase');
+            xmlString = xmlString.replace(/<\/tagsMapping>/, '\n</tagsMapping>');
+
+            var cleanedXmlString = removeEmptyLines(xmlString);
+
+            // Generate a new XML file with updated content
+            var blob = new Blob([cleanedXmlString], { type: 'application/xml' });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'New-Generated-XML.xml';
+            link.click();
+            showToast("A new XML has been generated and downloaded !");
+        } else {
+            console.error('Failed to load xmlDoc.');
+        }
+    }
+
+    function removeEmptyLines(xmlString) {
+        // Split the XML string into an array of lines
+        var lines = xmlString.split('\n');
+        
+        // Iterate over each line
+        for (var i = 0; i < lines.length; i++) {
+            // Trim leading and trailing whitespace from the line
+            var trimmedLine = lines[i].trim();
+
+            // If the line is empty, remove it from the array
+            if (trimmedLine === '') {
+                lines.splice(i, 1);
+                i--; // Decrement i to account for the removed line
+            }
+        }
+
+        // Join the array of lines back into a single string
+        var cleanedXmlString = lines.join('\n');
+        
+        return cleanedXmlString;
+    }
+
+
 
 </script>
 
