@@ -1046,7 +1046,7 @@
                     <div id="appendUpdateTags" class="menu-option">Overwrite or Append tags</div>
                     <div id="deleteSelectedTestCasesOption" class="menu-option">Delete selected Test cases</div>
                     <div id="addNewTestCaseToXML" class="menu-option">Add new Test case</div>
-                    <div id="browseTestCases" class="menu-option">Browse XML</div>
+                    <!-- <div id="browseTestCases" class="menu-option">Browse XML</div> -->
                 </div>                
             </div>
         </div>
@@ -1251,7 +1251,7 @@
 
     // Function to fetch and parse the XML file
     function fetchAndParseXML() {
-        fetch('poc.xml')
+        fetch('fleetrobottestTags.xml')
             .then(response => response.text())
             .then(xmlString => {
                 // Parse the XML string
@@ -1337,7 +1337,7 @@
             if (event.key === 'Enter') {
                 // Check for spaces
                 if (this.value.includes(' ')) {
-                    console.log("it has spaces");
+                    //console.log("it has spaces");
                     // Prevent default action (e.g., form submission)
                     event.preventDefault();
                     // Change the border color after the default action is prevented
@@ -1365,7 +1365,6 @@
             if (event.key === 'Enter') {
                 // Check for spaces
                 if (this.value.includes(' ')) {
-                    console.log("it has spaces");
                     // Prevent default action (e.g., form submission)
                     event.preventDefault();
                     // Change the border color after the default action is prevented
@@ -1401,7 +1400,7 @@
             // Check if any of the input fields are blank
             if (testCaseID === "" || robotTestName === "" || robotTestSuite === "") {
                 
-                console.log("Please fill in all the input fields.");
+                //console.log("Please fill in all the input fields.");
                 return; // Stop further execution if any input field is blank
             }else {
 
@@ -1440,14 +1439,11 @@
                                 // Trim trailing comma and space
                                 newTags = newTags.replace(/,\s*$/, '');
                                 
-                                console.log("Before same TC check");
 
                                 if(testCaseIdXML.trim() === testCaseID.trim() || testCaseNameXML.trim() === robotTestName.trim()){
-                                    console.log("Same TC found");
                                     // conditionMet = true;
                                     // showModalForNewTCOverwrite("Same Test Case is found in your XML file ! Do you want to overwrite ?");
                                     showModalForNewTCOverwrite("Same Test Case is found in your XML file ! Do you want to overwrite ?", function(result) {
-                                        console.log(result);
                                         if (result === "cancel") {
                                             conditionMet = true; // Set the flag to true
                                         }else {
@@ -1463,7 +1459,6 @@
 
                                             let existingRow;
                                             let tdElements = document.querySelectorAll('#tableBodyXML tr td');
-                                            console.log(tdElements);
                                             for (let td of tdElements) {
                                                 if (td.textContent.trim() === testCaseID) {
                                                     existingRow = td.parentNode;
@@ -1565,7 +1560,6 @@
         var generateDraftBtn = document.getElementById('generateDraftBtn');
         // Add event listener to the button
         generateDraftBtn.addEventListener('click', function() {
-            console.log("button event");
             // Check if at least one item is selected in multiSelect
             var multiSelect = document.getElementById('multiSelect');
             var selectedMultiOptions = multiSelect.selectedOptions;
@@ -1640,7 +1634,6 @@
 
                     // Call the function to append tags to selected rows
                     appendTagsToSelectedRows(selectedRows, selectedMultiOptions, selectedSecondMultiOptions);
-                    console.log("Append tags selected");
                     // Do something for appendTags option
                 }
                 closeModal();
@@ -2011,12 +2004,10 @@
             var tableBodyXMLData = document.getElementById('tableBodyXML');
             if (tableBodyXMLData.rows.length === 0) {
                 // No data present
-                console.log("No data in tableBodyXML");
                 showMainModal("No data is present in this page yet ! Add items to this page prior accessing this.");
                 handleTabClick('tree-tab');
             } else {
                 // Data present
-                console.log("Data found in tableBodyXML");
                 setTooltips();
             }
             
@@ -2178,7 +2169,6 @@
     }
 
     function addNewTestCase() {
-        console.log("add new test case function");
         document.getElementById('overlay').style.display = 'block';
         document.getElementById('modal-NewTC').style.display = 'block';
         launchModalForNewTesCase();
@@ -2206,7 +2196,6 @@
     }
 
     function launchModalForNewTesCase() {
-        console.log("launched modal for new test case");
         // ... (your existing modal launching code)
 
         // Read existingTagsArrayForModal and populate the multiSelect element
@@ -2216,7 +2205,6 @@
         multiSelectElement.innerHTML = '';
 
         // Populate with new options
-        console.log(existingTagsArrayForModal);
         existingTagsArrayForModal.forEach(function(tag) {
             var option = document.createElement('option');
             option.value = tag;
@@ -2271,13 +2259,13 @@
     // Assuming you have an element representing each menu option
     var appendUpdateTags = document.getElementById('appendUpdateTags');
     var deleteSelectedTestCasesOption = document.getElementById('deleteSelectedTestCasesOption');
-    var browseTestCases = document.getElementById('browseTestCases');
+    // var browseTestCases = document.getElementById('browseTestCases');
     var addNewTestCases = document.getElementById('addNewTestCaseToXML');
 
     // Add event listeners to call the corresponding functions when options are clicked
     appendUpdateTags.addEventListener('click', appendNewTag);
     deleteSelectedTestCasesOption.addEventListener('click', deleteSelectedTestCases);
-    browseTestCases.addEventListener('click', browseTestCases);
+    // browseTestCases.addEventListener('click', browseTestCases);
     addNewTestCases.addEventListener('click', addNewTestCase);
 
 
@@ -2417,7 +2405,7 @@
                         testCaseToDelete.parentNode.removeChild(testCaseToDelete);
                     }
                 } else {
-                    // Check if the Test Case ID exists in poc.xml
+                    // Check if the Test Case ID exists in xml referred from the repository
                     var existingTestCase = xmlDocNew.querySelector('testCase[id="' + testCaseId + '"]');
                     if (existingTestCase) {
                         // Update existing testCase element with new values
