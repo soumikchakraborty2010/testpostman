@@ -922,6 +922,34 @@
         .close-btn-errorMsg:hover {
             background-color: #bd2130;
         }
+
+        #ProceedAndOverwrite {
+            display: inline-block;
+            background-color: #c12038; /* Red background for delete button */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            width: 50%; /* Adjust width as needed */
+            text-align: center;
+        }
+
+        #cancelMainModalNewTCConfirmation {
+            display: inline-block;
+            background-color: #4CAF50; /* Green background for cancel button */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            width: 50%; /* Adjust width as needed */
+            margin-left: 10px; /* Add a small margin between buttons */
+        }
     </style>
 </head>
 <body>
@@ -1119,6 +1147,19 @@
                 <span class="modal-msg-close-btn" onclick="closeMainModalNewTC()">&times;</span>
                 <div class="modal-body">
                     <p id="mainModalMessage-NewTC"></p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-msg" id="newTCModalConfirmation">
+            <div class="modal-msg-content">
+                <!-- Close button -->
+                <span class="modal-msg-close-btn" onclick="closeConfirmModalNewTC()">&times;</span>
+                <div class="modal-body">
+                    <p id="mainModalNewTCConfirmation"></p>
+                </div>
+                <div class="modal-body">
+                    <button id="ProceedAndOverwrite">Proceed</button>
+                    <button id="cancelMainModalNewTCConfirmation" onclick="closeConfirmModalNewTC()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -1326,18 +1367,18 @@
 
                             // Trim trailing comma and space
                             newTags = newTags.replace(/,\s*$/, '');
+                            
+                            console.log("Before same TC check");
 
-
-                            if(testCaseIdXML.trim() === testCaseId.trim() || testCaseNameXML.trim() === robotTestName.trim()){
-
+                            if(testCaseIdXML.trim() === testCaseID.trim() || testCaseNameXML.trim() === robotTestName.trim()){
+                                console.log("Same TC found");
+                                showModalForNewTCOverwrite("Same Test Case is found in your XML file ! Do you want to overwrite ?");
                             }else {
-
-                            }
                                     // Create new row for tableBodyXML
                                     var newRow = document.createElement('tr');
                                     newRow.innerHTML = `
                                         <td><label class="overwrite-label">+</label></td>
-                                        <td>${testCaseId}</td>
+                                        <td>${testCaseID}</td>
                                         <td>${robotTestName}</td>
                                         <td>${robotTestSuite}</td>
                                         <td>${newTags}</td>
@@ -1347,7 +1388,7 @@
                                     let tdElements = document.querySelectorAll('#tableBodyXML tr td');
 
                                     for (let td of tdElements) {
-                                        if (td.textContent.trim() === testCaseId) {
+                                        if (td.textContent.trim() === testCaseID) {
                                             existingRow = td.parentNode;
                                             break; // Exit the loop once the condition is met
                                         }
@@ -1361,7 +1402,8 @@
                                         tableBodyXML.appendChild(newRow);
                                     }
                             closeModal();
-                        });
+                        }
+                    });
                 }
             }
         });
@@ -1477,12 +1519,11 @@
 
                     // Call the function to append tags to selected rows
                     appendTagsToSelectedRows(selectedRows, selectedMultiOptions, selectedSecondMultiOptions);
-
-
                     console.log("Append tags selected");
                     // Do something for appendTags option
                 }
                 console.log("Proceed");
+                closeModal();
             } else {
                 // Show modal if no tags are selected
                 showMainModal("No tags selected! Please select a tag to proceed.");
@@ -2116,6 +2157,12 @@
         document.body.classList.remove('modal-open'); // Remove class to enable scrolling on background
     }
 
+    function  closeConfirmModalNewTC(){
+        var mainModal = document.getElementById('newTCModalConfirmation');
+        mainModal.style.display = 'none';
+        document.body.classList.remove('modal-open'); // Remove class to enable scrolling on background
+    }
+
     function closeModalNewTestCaseDialog() {
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('modal-NewTC').style.display = 'none';
@@ -2157,6 +2204,13 @@
     function showModalForDeleteTC(message) {
         var mainModal = document.getElementById('mainModalDeleteTC');
         var mainModalMessage = document.getElementById('mainModalMessageDelete');
+        mainModalMessage.textContent = message;
+        mainModal.style.display = 'flex';
+    }
+
+    function showModalForNewTCOverwrite(message) {
+        var mainModal = document.getElementById('newTCModalConfirmation');
+        var mainModalMessage = document.getElementById('mainModalNewTCConfirmation');
         mainModalMessage.textContent = message;
         mainModal.style.display = 'flex';
     }
