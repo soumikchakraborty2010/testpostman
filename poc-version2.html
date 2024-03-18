@@ -965,6 +965,37 @@
             width: 50%; /* Adjust width as needed */
             margin-left: 10px; /* Add a small margin between buttons */
         }
+
+        .toast-message {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 2px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+        }
+
+        .toast-message.show {
+            visibility: visible;
+            animation: toastFadein 0.5s, toastFadeout 0.5s 4.5s;
+        }
+
+        @keyframes toastFadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes toastFadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+
     </style>
 </head>
 <body>
@@ -1178,7 +1209,8 @@
                 </div>
             </div>
         </div>
-    </div>    
+    </div> 
+    <div id="toastMessage" class="toast-message"></div>   
 <script>
 
     // Declare xmlDoc as a global variable
@@ -1580,6 +1612,7 @@
                             tableBodyXML.appendChild(newRow);
                         }
                         closeModal();
+                        showToast("Added to Generate XML tab !");
                     });
 
                     // Do something for replaceTags option
@@ -1590,8 +1623,8 @@
                     console.log("Append tags selected");
                     // Do something for appendTags option
                 }
-                console.log("Proceed");
                 closeModal();
+                showToast("Added to Generate XML tab !");
             } else {
                 // Show modal if no tags are selected
                 showMainModal("No tags selected! Please select a tag to proceed.");
@@ -1653,9 +1686,11 @@
             // If an existing row with the same Test Case ID exists, replace it; otherwise, append the new row
             if (existingRow) {
                 existingRow.replaceWith(newRow);
+                showToast("Added to Generate XML tab !");
             } else {
                 var tableBodyXML = document.getElementById('tableBodyXML');
                 tableBodyXML.appendChild(newRow);
+                showToast("Added to Generate XML tab !");
             }
         });
     }
@@ -1699,6 +1734,8 @@
             }
 
             closeMainModalDeleteTC();
+            showToast("Added to Generate XML tab for deletion !");
+
         });
     }
 
@@ -2352,6 +2389,14 @@
             showModalNewTestCase("Already exists in New Tags list ! Please choose a unique name.");
         }
     }
+
+    function showToast(message) {
+        var toast = document.getElementById("toastMessage");
+        toast.textContent = message;
+        toast.className = "toast-message show";
+        setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 5000);
+    }
+
 
 </script>
 
