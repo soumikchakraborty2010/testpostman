@@ -737,7 +737,7 @@
             border-radius: 0;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
             width: 70%; /* Adjust width as needed */
-            height: 60%; /* Adjust height as needed */
+            height: 53%; /* Adjust height as needed */
             overflow: auto;
             max-width: 600px;
             /* max-height: calc(800px / 2);  */
@@ -762,6 +762,15 @@
             position: absolute; /* Position absolute for precise placement */
             top: 1px; /* Adjust top position as needed */
             left: 1px; /* Adjust left position to be at the extreme left */
+        }
+
+        .left-control-new-tc #multiSelect-new-tc {
+            height: 250px; 
+        }
+
+        .left-control-new-tc #multiSelect-new-tc option:checked 
+        .right-control-new-tc #secondMultiSelect-new-tc option:checked {
+            background-color: #f5f5f5 !important; /* Add !important to ensure it takes precedence */
         }
 
         /* Top control */
@@ -989,7 +998,7 @@
                 </div>
     
                 <div class="text-box-container">
-                    <input type="text" id="newTagTextbox" placeholder="Enter new tag" disabled />
+                    <input type="text" id="newTagTextbox" placeholder="Enter new tag and press enter" disabled />
                 </div>
     
                 <div class="second-multi-select-container">
@@ -1055,7 +1064,7 @@
             </div>
         </div>
     </div>
-    <div class="modalNewTC" id="modal-NewTestCase">    
+    <div class="modalNewTC" id="modal-NewTC">    
         <div class="modal-content-new-tc">
             <div class="modal-title-new-tc">Add New Test case</div>
             <!-- Top control items -->
@@ -1067,8 +1076,8 @@
             <!-- Middle control items -->
             <div class="middle-control-new-tc">
                 <div class="left-control-new-tc">
-                    <label for="multiSelect">Select from Existing Tags:</label>
-                    <select id="multiSelect" multiple size="10">
+                    <label for="multiSelect-new-tc">Select from Existing Tags:</label>
+                    <select id="multiSelect-new-tc" multiple size="10">
                     </select>
                 </div>
                 <div class="right-control-new-tc">
@@ -1078,7 +1087,7 @@
                     </div>
     
                     <div class="text-box-container-new-tc">
-                        <input type="text" id="newTagTextbox-new-tc" placeholder="Enter new tag" disabled />
+                        <input type="text" id="newTagTextbox-new-tc" placeholder="Enter new tag and press Enter" disabled />
                     </div>
     
                     <div class="second-multi-select-container-new-tc">
@@ -1091,11 +1100,11 @@
             <!-- Generate Draft button -->
             <button id="generateDraftBtn-new-tc">Add to Generate XML page</button>
             <!-- Close button -->
-            <span class="close-btn-new-tc" onclick="closeModal()">&times;</span>
+            <span class="close-btn-new-tc" onclick="closeModalNewTestCaseDialog()">&times;</span>
             <h2></h2>
             <!-- Add your controls/operations here -->
         </div>
-        <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-overlay" id="modalOverlayNewTC">
             <!-- Modal dialog -->
             <div class="modal-dialog">
                 <!-- Error message -->
@@ -1104,8 +1113,16 @@
                 <button class="close-btn-errorMsg" onclick="closeModalOverlay()">Close</button>
             </div>
         </div>
-    </div>
-    
+        <div class="modal-msg" id="mainModalNewTC">
+            <div class="modal-msg-content">
+                <!-- Close button -->
+                <span class="modal-msg-close-btn" onclick="closeMainModalNewTC()">&times;</span>
+                <div class="modal-body">
+                    <p id="mainModalMessage-NewTC"></p>
+                </div>
+            </div>
+        </div>
+    </div>    
 <script>
 
     // Declare xmlDoc as a global variable
@@ -1160,7 +1177,22 @@
                 // Disable newTagTextbox and set default text
                 newTagTextbox.disabled = true;
                 newTagTextbox.value = '';
-                newTagTextbox.placeholder = 'Enter new tag';
+                newTagTextbox.placeholder = 'Enter new tag and press Enter';
+            }
+        });
+
+        var addNewTagCheckboxnewTC = document.getElementById('addNewTagCheckbox-new-tc');
+        var newTagTextboxnewTC = document.getElementById('newTagTextbox-new-tc');
+        addNewTagCheckboxnewTC.addEventListener('change', function() {
+            if (this.checked) {
+                // Enable newTagTextbox and clear default text
+                newTagTextboxnewTC.disabled = false;
+                newTagTextboxnewTC.placeholder = '';
+            } else {
+                // Disable newTagTextbox and set default text
+                newTagTextboxnewTC.disabled = true;
+                newTagTextboxnewTC.value = '';
+                newTagTextboxnewTC.placeholder = 'Enter new tag and press Enter';
             }
         });
 
@@ -1174,6 +1206,18 @@
             } else {
                 // Reset border color if no spaces
                 newTagTextbox.style.borderColor = '';
+            }
+        });
+
+        newTagTextboxnewTC.addEventListener('input', function(event) {
+            // Check for spaces
+            if (event.target.value.includes(' ')) {
+                // Provide user feedback by changing border color
+                newTagTextboxnewTC.style.borderColor = 'red';
+                showModalNewTestCase("Tags with spaces are not allowed. Use hyphen (-) instead.");
+            } else {
+                // Reset border color if no spaces
+                newTagTextboxnewTC.style.borderColor = '';
             }
         });
 
@@ -1204,6 +1248,125 @@
                 }
             }
         });
+
+        newTagTextboxnewTC.addEventListener('keydown', function(event) {
+            // Check if the key pressed is Enter
+            if (event.key === 'Enter') {
+                // Check for spaces
+                if (this.value.includes(' ')) {
+                    console.log("it has spaces");
+                    // Prevent default action (e.g., form submission)
+                    event.preventDefault();
+                    // Change the border color after the default action is prevented
+                    this.style.borderColor = 'red';
+                    showModalNewTestCase("Tags with spaces are not allowed. Use hyphen (-) instead.");
+                    // Focus the element to make sure it retains visual focus
+                    this.focus();
+                } else {
+                    this.style.borderColor = '';
+                    if(checkExistingTag(this.value)){
+                        showModalNewTestCase("Already an existing Tags list ! Please choose a unique name.");
+                    }else {
+                        if(this.value.trim() !== ""){
+                            addToSecondMultiSelectNewTC(this.value,newTagTextbox);
+                        }
+                    }
+                    // Reset border color if no spaces
+                    
+                }
+            }
+        });
+
+
+            // Find the button element
+        var generateDraftBtnNewTC = document.getElementById("generateDraftBtn-new-tc");
+
+        // Add event listener to the button
+        generateDraftBtnNewTC.addEventListener("click", function() {
+            // Get the values of the input fields
+            var testCaseID = document.getElementById("newTestCaseIDTextbox").value.trim();
+            var robotTestName = document.getElementById("newRobotTestNameTextbox").value.trim();
+            var robotTestSuite = document.getElementById("newRobotTestSuiteTextbox").value.trim();
+
+            // Check if any of the input fields are blank
+            if (testCaseID === "" || robotTestName === "" || robotTestSuite === "") {
+                
+                console.log("Please fill in all the input fields.");
+                return; // Stop further execution if any input field is blank
+            }else {
+
+                var multiSelect = document.getElementById('multiSelect-new-tc');
+                var selectedMultiOptions = multiSelect.selectedOptions;
+
+                // Check if at least one item is selected in secondMultiSelect
+                var secondMultiSelect = document.getElementById('secondMultiSelect-new-tc');
+                var selectedSecondMultiOptions = secondMultiSelect.selectedOptions;
+
+                if (selectedMultiOptions.length > 0 || selectedSecondMultiOptions.length > 0) {
+
+                    // Get the selected rows from tableBody
+                    var tableBody = document.getElementById('tableBody');
+                    var selectedRows = tableBody.querySelectorAll('tr');
+
+                        // Iterate over selected rows and update Tags column
+                        selectedRows.forEach(function(row) {
+                            var testCaseIdXML = row.cells[1].textContent; // Assuming the second column is the Test Case ID
+                            var testCaseNameXML = row.cells[2].textContent; // Assuming the second column is the Test Case ID
+                            var newTags = '';
+
+                            // Create comma-separated list of selected tags from multiSelect
+                            for (var i = 0; i < selectedMultiOptions.length; i++) {
+                                newTags += selectedMultiOptions[i].textContent + ', ';
+                            }
+
+                            // Create comma-separated list of selected tags from secondMultiSelect
+                            for (var j = 0; j < selectedSecondMultiOptions.length; j++) {
+                                newTags += selectedSecondMultiOptions[j].textContent + ', ';
+                            }
+
+                            // Trim trailing comma and space
+                            newTags = newTags.replace(/,\s*$/, '');
+
+
+                            if(testCaseIdXML.trim() === testCaseId.trim() || testCaseNameXML.trim() === robotTestName.trim()){
+
+                            }else {
+
+                            }
+                                    // Create new row for tableBodyXML
+                                    var newRow = document.createElement('tr');
+                                    newRow.innerHTML = `
+                                        <td><label class="overwrite-label">+</label></td>
+                                        <td>${testCaseId}</td>
+                                        <td>${robotTestName}</td>
+                                        <td>${robotTestSuite}</td>
+                                        <td>${newTags}</td>
+                                    `;
+
+                                    let existingRow;
+                                    let tdElements = document.querySelectorAll('#tableBodyXML tr td');
+
+                                    for (let td of tdElements) {
+                                        if (td.textContent.trim() === testCaseId) {
+                                            existingRow = td.parentNode;
+                                            break; // Exit the loop once the condition is met
+                                        }
+                                    }
+
+                                    // If an existing row with the same Test Case ID exists, replace it; otherwise, append the new row
+                                    if (existingRow) {
+                                        existingRow.replaceWith(newRow);
+                                    } else {
+                                        var tableBodyXML = document.getElementById('tableBodyXML');
+                                        tableBodyXML.appendChild(newRow);
+                                    }
+                            closeModal();
+                        });
+                }
+            }
+        });
+
+
 
         var multiSelect = document.getElementById('multiSelect');
         var secondMultiSelect = document.getElementById('secondMultiSelect');
@@ -1486,7 +1649,7 @@
             existingTagsArrayForModal.splice(indexOfAllTags, 1);
         }
         // Log the tags list to the console
-        console.log(existingTagsArrayForModal);
+        // console.log(existingTagsArrayForModal);
         return existingTagsArrayForModal;
     }
 
@@ -1873,15 +2036,9 @@
     function addNewTestCase() {
         console.log("add new test case function");
         document.getElementById('overlay').style.display = 'block';
-        document.getElementById('modal-NewTestCase').style.display = 'block';
-        launchModal();
+        document.getElementById('modal-NewTC').style.display = 'block';
+        launchModalForNewTesCase();
 
-        // if (selectedRowCount > 0) {
-        //     // Show the overlay and modal
-
-        // } else {
-
-        // }
     }
 
     function launchModal() {
@@ -1903,6 +2060,29 @@
 
         // ... (other modal setup code)
     }
+
+    function launchModalForNewTesCase() {
+        console.log("launched modal for new test case");
+        // ... (your existing modal launching code)
+
+        // Read existingTagsArrayForModal and populate the multiSelect element
+        var multiSelectElement = document.getElementById('multiSelect-new-tc');
+
+        // Clear existing options
+        multiSelectElement.innerHTML = '';
+
+        // Populate with new options
+        console.log(existingTagsArrayForModal);
+        existingTagsArrayForModal.forEach(function(tag) {
+            var option = document.createElement('option');
+            option.value = tag;
+            option.text = tag;
+            multiSelectElement.appendChild(option);
+        });
+
+        // ... (other modal setup code)
+    }
+
 
 
 
@@ -1930,6 +2110,17 @@
         document.body.classList.remove('modal-open'); // Remove class to enable scrolling on background
     }
 
+    function closeMainModalNewTC() {
+        var mainModal = document.getElementById('mainModalNewTC');
+        mainModal.style.display = 'none';
+        document.body.classList.remove('modal-open'); // Remove class to enable scrolling on background
+    }
+
+    function closeModalNewTestCaseDialog() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('modal-NewTC').style.display = 'none';
+    }
+
     // Assuming you have an element representing each menu option
     var appendUpdateTags = document.getElementById('appendUpdateTags');
     var deleteSelectedTestCasesOption = document.getElementById('deleteSelectedTestCasesOption');
@@ -1952,6 +2143,13 @@
     function showModal(message) {
         var mainModal = document.getElementById('mainModal');
         var mainModalMessage = document.getElementById('mainModalMessage');
+        mainModalMessage.textContent = message;
+        mainModal.style.display = 'flex';
+    }
+
+    function showModalNewTestCase(message) {
+        var mainModal = document.getElementById('mainModalNewTC');
+        var mainModalMessage = document.getElementById('mainModalMessage-NewTC');
         mainModalMessage.textContent = message;
         mainModal.style.display = 'flex';
     }
@@ -1996,6 +2194,26 @@
             HTMLElement.value = '';
         } else {
             showModal("Already exists in New Tags list ! Please choose a unique name.");
+        }
+    }
+
+    function addToSecondMultiSelectNewTC(value,HTMLElement) {
+        var secondMultiSelect = document.getElementById('secondMultiSelect-new-tc');
+        var exists = false;
+        for (var i = 0; i < secondMultiSelect.options.length; i++) {
+            if (secondMultiSelect.options[i].value === value) {
+                exists = true;
+                break;
+            }
+        }
+        if (!exists) {
+            var option = document.createElement('option');
+            option.value = value;
+            option.textContent = value;
+            secondMultiSelect.appendChild(option);
+            HTMLElement.value = '';
+        } else {
+            showModalNewTestCase("Already exists in New Tags list ! Please choose a unique name.");
         }
     }
 
