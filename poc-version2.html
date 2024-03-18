@@ -766,6 +766,7 @@
 
         /* Top control */
         .top-control-new-tc {
+            margin-top: 25px;
             margin-bottom: 20px;
         }
 
@@ -792,6 +793,7 @@
         }
 
         .left-control-new-tc select,
+        .right-control-new-tc select,
         .right-control-new-tc input {
             width: 100%;
             padding: 10px;
@@ -800,12 +802,26 @@
             border-radius: 5px;
         }
 
+        .checkbox-container-new-tc{
+            display: flex; /* Use flexbox */
+            align-items: center; /* Align items vertically */
+        }
+
+        .checkbox-container-new-tc input[type="checkbox"] {
+            margin: 0;
+            margin-bottom: 2px;
+            /* margin-right: 5px;  */
+            width: 20px;
+            align-self: flex-start;
+        }
+
+
         /* Generate Draft button */
         #generateDraftBtn-new-tc {
             display: block;
             width: 100%;
             padding: 10px;
-            background-color: #007bff;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
@@ -813,7 +829,7 @@
         }
 
         #generateDraftBtn-new-tc:hover {
-            background-color: #0056b3;
+            background-color: #45a049;
         }
 
         /* Close button */
@@ -833,7 +849,8 @@
             height: 35px; /* Adjust height to match modal-title-new-tc */
             line-height: 30px; /* Adjust line height to center text vertically */
             text-align: center; /* Center the text horizontally */
-            background-color: #007bff; /* Button background color */
+            background-color: #28a745; 
+            /* background-color: #007bff; Button background color */
             color: #fff; /* Button text color */
             border: none; /* Remove button border */
             border-radius: 0; /* Remove border radius */
@@ -845,6 +862,11 @@
             display: flex; /* Use flexbox for alignment */
             align-items: center; /* Center vertically */
             justify-content: center; /* Center horizontally */
+        }
+
+
+        .close-btn-new-tc:hover {
+            color: #f00;
         }
 
 
